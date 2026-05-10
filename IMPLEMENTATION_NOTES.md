@@ -62,9 +62,42 @@ This keeps the validation page and future backend separate from Orchestrator.
 
 ## Waitlist Persistence
 
-Use a new Supabase project for Agent Passport.
+Do not use Orchestrator's existing database for Agent Passport validation.
 
-Do not use Orchestrator's existing Supabase project for the validation launch.
+The first validation launch should use a disposable form collector endpoint instead of a database.
+
+Recommended temporary options:
+
+- Formspree
+- Tally
+- Basin
+- Typeform
+- Google Forms if speed matters more than polish
+
+The frontend should post to:
+
+```text
+VITE_WAITLIST_ENDPOINT
+```
+
+This gives us:
+
+- no Orchestrator DB pollution
+- no extra Supabase project cost
+- no schema coupling
+- easy export to CSV later
+- easy replacement with a dedicated Agent Passport DB when the idea proves real
+
+Do not use the existing Orchestrator Supabase project unless we make an explicit temporary exception.
+
+If we ever do temporarily use the existing database, isolation must be strict:
+
+- separate table prefix: `agent_passport_*`
+- no Orchestrator user IDs
+- no foreign keys to Orchestrator tables
+- no shared auth
+- no writes to existing Orchestrator tables
+- documented migration/export path to a future dedicated database
 
 Reason:
 
@@ -98,17 +131,3 @@ Orchestrator app tables
 Orchestrator backend
 Orchestrator marketing app
 ```
-
-Use a dedicated table for discovery submissions:
-
-```text
-public.agent_passport_waitlist
-```
-
-Migration:
-
-```text
-agent-passport/supabase/migrations/20260510_agent_passport_waitlist.sql
-```
-
-The validation page posts directly to Supabase using the public anon key and an insert-only RLS policy. This keeps the first validation surface simple while preserving the option to add a backend/API later.
