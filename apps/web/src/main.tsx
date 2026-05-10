@@ -6,7 +6,8 @@ import './styles.css';
 
 const apps = ['Gmail', 'Slack', 'Notion', 'Calendar', 'GitHub', 'Linear'];
 const providers = ['Composio', 'Arcade', 'Nango', 'Pipedream'];
-const waitlistEndpoint = import.meta.env.VITE_WAITLIST_ENDPOINT;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const faqs = [
   {
     question: 'Is this a Composio replacement?',
@@ -40,10 +41,10 @@ function App() {
     setStatus('loading');
     setMessage('');
 
-    if (!waitlistEndpoint) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       setStatus('error');
       setMessage('Waitlist storage is not configured in this environment yet.');
-      track('agent_passport_form_failed', { reason: 'missing_waitlist_endpoint' });
+      track('agent_passport_form_failed', { reason: 'missing_supabase_env' });
       return;
     }
 
@@ -54,15 +55,18 @@ function App() {
       provider: String(form.get('provider') || ''),
       building: String(form.get('context') || ''),
       pain: String(form.get('pain') || ''),
-      callOptIn: form.get('callOptIn') === 'on',
+      call_opt_in: form.get('callOptIn') === 'on',
       source: 'agent-passport',
     };
 
     try {
-      const response = await fetch(waitlistEndpoint, {
+      const response = await fetch(`${supabaseUrl}/rest/v1/agent_passport_waitlist`, {
         method: 'POST',
         headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
           'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
         },
         body: JSON.stringify(payload),
       });
@@ -80,7 +84,7 @@ function App() {
       setMessage('Request received. We will use this to qualify discovery calls.');
       track('agent_passport_form_submitted', {
         provider: payload.provider,
-        call_opt_in: payload.callOptIn,
+        call_opt_in: payload.call_opt_in,
       });
     } catch (error) {
       setStatus('error');
