@@ -1,6 +1,7 @@
 import React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { track } from './analytics';
 import './styles.css';
 
 const apps = ['Gmail', 'Slack', 'Notion', 'Calendar', 'GitHub', 'Linear'];
@@ -31,6 +32,10 @@ function App() {
   );
   const [message, setMessage] = useState('');
 
+  useEffect(() => {
+    track('agent_passport_page_viewed');
+  }, []);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('loading');
@@ -39,6 +44,7 @@ function App() {
     if (!supabaseUrl || !supabaseAnonKey) {
       setStatus('error');
       setMessage('Waitlist storage is not configured in this environment yet.');
+      track('agent_passport_form_failed', { reason: 'missing_supabase_env' });
       return;
     }
 
@@ -76,9 +82,16 @@ function App() {
       event.currentTarget.reset();
       setStatus('success');
       setMessage('Request received. We will use this to qualify discovery calls.');
+      track('agent_passport_form_submitted', {
+        provider: payload.provider,
+        call_opt_in: payload.call_opt_in,
+      });
     } catch (error) {
       setStatus('error');
       setMessage(error instanceof Error ? error.message : 'Something went wrong.');
+      track('agent_passport_form_failed', {
+        reason: error instanceof Error ? error.message : 'unknown',
+      });
     }
   }
 
@@ -101,10 +114,18 @@ function App() {
               setup every time.
             </p>
             <div className="actions">
-              <a className="primary" href="#waitlist">
+              <a
+                className="primary"
+                href="#waitlist"
+                onClick={() => track('agent_passport_primary_cta_clicked')}
+              >
                 Request beta access
               </a>
-              <a className="secondary" href="#how">
+              <a
+                className="secondary"
+                href="#how"
+                onClick={() => track('agent_passport_secondary_cta_clicked')}
+              >
                 See how it works
               </a>
             </div>
