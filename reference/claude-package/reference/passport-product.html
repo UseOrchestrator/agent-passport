@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Passport — Dashboard wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #F2EDE3;
+    --paper-deep:   #E8DFC8;
+    --paper-card:   #ECE5D5;
+    --ink:          #1A1816;
+    --ink-soft:     #5C544A;
+    --ink-faint:    #8A7E6E;
+    --stamp:        #A03B2A;
+    --stamp-soft:   #C25946;
+    --seal:         #1F2A40;
+    --rule:         #C7BDAB;
+    --rule-soft:    #DACFB9;
+    --green:        #4D6B3F;
+    --amber:        #B5851D;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Instrument Sans', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+  /* ============ APP SHELL ============ */
+  .shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    background: var(--paper-deep);
+    border-right: 1px solid var(--rule);
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+  }
+  .sb-brand {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    font-style: italic;
+    padding: 4px 8px 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 20px;
+  }
+  .sb-brand::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--stamp);
+    border-radius: 50%;
+    transform: translateY(-2px);
+  }
+  .sb-passport-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .sb-passport-card::before {
+    content: 'PASSPORT';
+    position: absolute;
+    top: -7px;
+    left: 12px;
+    background: var(--paper-deep);
+    padding: 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+  }
+  .sb-pp-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .sb-pp-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.5px;
+  }
+  .sb-pp-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .sb-pp-stats strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .sb-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0 8px 6px;
+    margin-top: 12px;
+  }
+  .sb-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .sb-link {
+    padding: 9px 12px;
+    border-radius: 3px;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .sb-link:hover { background: rgba(0,0,0,0.04); }
+  .sb-link.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .sb-link .icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .sb-link .count {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    opacity: 0.7;
+  }
+  .sb-foot {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  /* ============ MAIN ============ */
+  .main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    height: 56px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: var(--paper);
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .topbar-title h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    font-weight: 400;
+  }
+  .topbar-title .breadcrumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .topbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn {
+    padding: 7px 14px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--stamp); }
+  .btn-ghost {
+    color: var(--ink-soft);
+    border-color: var(--rule);
+  }
+  .btn-ghost:hover { background: var(--paper-card); color: var(--ink); }
+  .btn-danger {
+    color: var(--stamp);
+    border-color: var(--rule);
+  }
+  .btn-danger:hover { background: var(--stamp); color: var(--paper); border-color: var(--stamp); }
+
+  /* ============ CONTENT ============ */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 32px 64px;
+    background: var(--paper);
+  }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ============ CONNECTIONS GRID ============ */
+  .conn-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--paper-card);
+    max-width: 480px;
+  }
+  .conn-search input {
+    border: none;
+    background: none;
+    flex: 1;
+    font: inherit;
+    outline: none;
+    color: var(--ink);
+  }
+  .conn-search input::placeholder { color: var(--ink-faint); }
+  .conn-search-icon {
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .conn-section-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .conn-section-head::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule-soft);
+  }
+  .conn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--paper-card);
+    margin-bottom: 32px;
+  }
+  .conn {
+    padding: 18px 20px;
+    border-right: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--paper-card);
+    transition: background 0.15s;
+    cursor: pointer;
+    position: relative;
+  }
+  .conn:hover { background: var(--paper-deep); }
+  .conn-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .conn-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 19px;
+    font-weight: 500;
+    margin-bottom: 1px;
+  }
+  .conn-account {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .conn-status {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-top: 7px;
+    flex-shrink: 0;
+  }
+  .conn-status.expired { background: var(--stamp); }
+  .conn-status.idle { background: var(--amber); }
+  .conn-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.3px;
+  }
+  .conn-meta span:last-child {
+    color: var(--ink-soft);
+  }
+  .conn-add {
+    background: var(--paper);
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-style: dashed;
+  }
+  .conn-add:hover { color: var(--stamp); }
+
+  /* ============ SETS ============ */
+  .set {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .set-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .set-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+  }
+  .set-desc {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .set-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .set-apps {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .chip.add {
+    color: var(--ink-faint);
+    border-style: dashed;
+    cursor: pointer;
+  }
+  .chip.add::before { display: none; }
+  .chip.add:hover { color: var(--stamp); border-color: var(--stamp); }
+  .set-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .set-stats strong { color: var(--ink); font-weight: 600; }
+
+  /* ============ APPROVED PRODUCTS ============ */
+  .product {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .product-head {
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--rule-soft);
+    background: var(--paper);
+  }
+  .product-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .product-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--stamp);
+  }
+  .product-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .product-detail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+  }
+  .product-status {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .product-body {
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+  .product-body-col h5 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .product-body-col .scope-row {
+    font-size: 13px;
+    padding: 3px 0;
+    color: var(--ink-soft);
+  }
+  .product-body-col .scope-row::before {
+    content: '✓ ';
+    color: var(--green);
+    font-weight: 600;
+  }
+  .product-foot {
+    padding: 12px 24px;
+    border-top: 1px solid var(--rule-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  /* ============ AUDIT LOG ============ */
+  .audit-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .audit-filter {
+    padding: 6px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    background: var(--paper-card);
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .audit-filter:hover, .audit-filter.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .audit-table {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .audit-row {
+    display: grid;
+    grid-template-columns: 110px 130px 1fr 120px 80px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    align-items: center;
+    gap: 16px;
+  }
+  .audit-row:last-child { border-bottom: none; }
+  .audit-row.head {
+    background: var(--paper-deep);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    padding: 10px 20px;
+  }
+  .audit-time { color: var(--ink-faint); }
+  .audit-product { color: var(--ink); font-weight: 500; }
+  .audit-action { color: var(--ink-soft); font-family: 'Instrument Sans', sans-serif; font-size: 13px; }
+  .audit-action strong { color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 11.5px; padding: 1px 5px; background: var(--paper); border-radius: 2px; border: 1px solid var(--rule); }
+  .audit-app { color: var(--ink-soft); }
+  .audit-result {
+    text-align: right;
+    color: var(--green);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .audit-result.fail { color: var(--stamp); }
+
+  /* responsive */
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .product-body { grid-template-columns: 1fr; }
+    .audit-row { grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; }
+    .audit-row.head { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">Passport</div>
+
+    <div class="sb-passport-card">
+      <div class="sb-pp-name">Alice Park</div>
+      <div class="sb-pp-id">pp_27a4_b9c1f</div>
+      <div class="sb-pp-stats">
+        <span><strong>6</strong> apps</span>
+        <span><strong>2</strong> sets</span>
+        <span><strong>3</strong> products</span>
+      </div>
+    </div>
+
+    <div class="sb-section-label">Manage</div>
+    <nav class="sb-nav">
+      <button class="sb-link active" data-view="connections">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v2H2zm0 3h12v2H2zm0 3h12v2H2z"/></svg>
+        Connections <span class="count">6</span>
+      </button>
+      <button class="sb-link" data-view="sets">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h6v6H2zm6 0h6v6H8zM2 8h6v6H2zm6 0h6v6H8z" fill-rule="evenodd"/></svg>
+        Sets <span class="count">2</span>
+      </button>
+      <button class="sb-link" data-view="products">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 4v6l-7 4-7-4V5l7-4zm0 2.18L3 5.5v5l5 2.82 5-2.82v-5L8 3.18z"/></svg>
+        Approved products <span class="count">3</span>
+      </button>
+      <button class="sb-link" data-view="audit">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2h10v12H3zm2 2v2h6V4zm0 3v1h6V7zm0 2v1h6V9z"/></svg>
+        Audit log
+      </button>
+    </nav>
+
+    <div class="sb-section-label" style="margin-top: 24px;">Account</div>
+    <nav class="sb-nav">
+      <button class="sb-link">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3 3-5 6-5s6 2 6 5"/></svg>
+        Profile
+      </button>
+      <button class="sb-link">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.5 3.5L13 5l-2.5 2.5L11 11 8 9.5 5 11l.5-3.5L3 5l3.5-.5z"/></svg>
+        Security
+      </button>
+    </nav>
+
+    <div class="sb-foot">
+      <button class="sb-link">
+        <svg class="icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 4v4l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+        Help
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ========== CONNECTIONS VIEW ========== -->
+    <div class="topbar" data-topbar="connections">
+      <div class="topbar-title">
+        <h1>Connections</h1>
+        <span class="breadcrumb">6 active · 1 idle</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost">Import</button>
+        <button class="btn btn-primary">+ Connect app</button>
+      </div>
+    </div>
+
+    <div class="content view active" data-view="connections">
+
+      <div class="conn-search">
+        <span class="conn-search-icon">⌕</span>
+        <input placeholder="Search 9,000+ apps — Gmail, Slack, Salesforce…" />
+      </div>
+
+      <div class="conn-section-head">Active · 6</div>
+      <div class="conn-grid">
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">Gmail</div>
+              <div class="conn-account">alice@company.com</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Composio</span>
+            <span>5 scopes</span>
+          </div>
+        </div>
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">Google Calendar</div>
+              <div class="conn-account">alice@company.com</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Composio</span>
+            <span>3 scopes</span>
+          </div>
+        </div>
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">Slack</div>
+              <div class="conn-account">company.slack.com</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Pipedream</span>
+            <span>4 scopes</span>
+          </div>
+        </div>
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">Notion</div>
+              <div class="conn-account">Company Workspace</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Composio</span>
+            <span>full access</span>
+          </div>
+        </div>
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">Linear</div>
+              <div class="conn-account">Product Team</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Nango</span>
+            <span>3 scopes</span>
+          </div>
+        </div>
+
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">GitHub</div>
+              <div class="conn-account">company-org</div>
+            </div>
+            <div class="conn-status"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Composio</span>
+            <span>repo · read</span>
+          </div>
+        </div>
+
+        <div class="conn conn-add">+ Connect another</div>
+      </div>
+
+      <div class="conn-section-head">Idle · 1</div>
+      <div class="conn-grid">
+        <div class="conn">
+          <div class="conn-head">
+            <div>
+              <div class="conn-name">HubSpot</div>
+              <div class="conn-account">Connected, no recent use</div>
+            </div>
+            <div class="conn-status idle"></div>
+          </div>
+          <div class="conn-meta">
+            <span>via Composio</span>
+            <span>last used 28d ago</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== SETS VIEW ========== -->
+    <div class="topbar" data-topbar="sets" style="display:none;">
+      <div class="topbar-title">
+        <h1>Sets</h1>
+        <span class="breadcrumb">2 sets · reusable bundles</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary">+ New set</button>
+      </div>
+    </div>
+
+    <div class="content view" data-view="sets">
+
+      <p style="color: var(--ink-soft); max-width: 640px; margin-bottom: 24px; font-size: 14.5px;">
+        Sets bundle connections together so you can approve them as a group when an AI product asks. They're reusable across products.
+      </p>
+
+      <div class="set">
+        <div class="set-head">
+          <div>
+            <div class="set-name">Founder Stack <span style="color: var(--ink-faint); font-size: 16px; font-style: italic;">— used by 2 products</span></div>
+            <div class="set-desc">My day-to-day tools. Communications, scheduling, docs, planning.</div>
+          </div>
+          <div class="set-actions">
+            <button class="btn btn-ghost">Edit</button>
+            <button class="btn btn-ghost">Share</button>
+          </div>
+        </div>
+        <div class="set-apps">
+          <span class="chip">Gmail</span>
+          <span class="chip">Google Calendar</span>
+          <span class="chip">Slack</span>
+          <span class="chip">Notion</span>
+          <span class="chip">Linear</span>
+          <span class="chip add">+ add app</span>
+        </div>
+        <div class="set-stats">
+          <span><strong>5</strong> connections</span>
+          <span><strong>2</strong> products approved</span>
+          <span>Created <strong>Apr 12, 2026</strong></span>
+          <span>Last used <strong>2h ago</strong></span>
+        </div>
+      </div>
+
+      <div class="set">
+        <div class="set-head">
+          <div>
+            <div class="set-name">Engineering Stack <span style="color: var(--ink-faint); font-size: 16px; font-style: italic;">— used by 1 product</span></div>
+            <div class="set-desc">Code review, ticket triage, repo management.</div>
+          </div>
+          <div class="set-actions">
+            <button class="btn btn-ghost">Edit</button>
+            <button class="btn btn-ghost">Share</button>
+          </div>
+        </div>
+        <div class="set-apps">
+          <span class="chip">GitHub</span>
+          <span class="chip">Linear</span>
+          <span class="chip">Slack</span>
+          <span class="chip">Notion</span>
+          <span class="chip add">+ add app</span>
+        </div>
+        <div class="set-stats">
+          <span><strong>4</strong> connections</span>
+          <span><strong>1</strong> product approved</span>
+          <span>Created <strong>Apr 24, 2026</strong></span>
+          <span>Last used <strong>yesterday</strong></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== APPROVED PRODUCTS VIEW ========== -->
+    <div class="topbar" data-topbar="products" style="display:none;">
+      <div class="topbar-title">
+        <h1>Approved AI products</h1>
+        <span class="breadcrumb">3 products · all active</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost">Export</button>
+      </div>
+    </div>
+
+    <div class="content view" data-view="products">
+
+      <p style="color: var(--ink-soft); max-width: 640px; margin-bottom: 24px; font-size: 14.5px;">
+        AI products that can act on your behalf using your Passport. Revoke any of them in one click — every connection they used will be cut off immediately.
+      </p>
+
+      <div class="product">
+        <div class="product-head">
+          <div class="product-info">
+            <div class="product-icon">O</div>
+            <div>
+              <div class="product-name">Orchestrator</div>
+              <div class="product-detail">orchestrator.so · approved Apr 14, 2026</div>
+            </div>
+          </div>
+          <div class="product-status">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 1px;">● Active</span>
+            <button class="btn btn-danger">Revoke</button>
+          </div>
+        </div>
+        <div class="product-body">
+          <div class="product-body-col">
+            <h5>Approved Set</h5>
+            <div class="scope-row">Founder Stack</div>
+            <div class="scope-row">Engineering Stack</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Can read</h5>
+            <div class="scope-row">Gmail messages</div>
+            <div class="scope-row">Calendar events</div>
+            <div class="scope-row">Notion pages</div>
+            <div class="scope-row">Linear issues</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Can write (with approval)</h5>
+            <div class="scope-row">Send email as you</div>
+            <div class="scope-row">Create calendar events</div>
+            <div class="scope-row">Post in Slack</div>
+          </div>
+        </div>
+        <div class="product-foot">
+          <span>Last action: 14 minutes ago — gmail.send_email</span>
+          <span>247 actions in last 30 days</span>
+        </div>
+      </div>
+
+      <div class="product">
+        <div class="product-head">
+          <div class="product-info">
+            <div class="product-icon">R</div>
+            <div>
+              <div class="product-name">Recruiting Copilot</div>
+              <div class="product-detail">recruit.ai · approved Apr 28, 2026</div>
+            </div>
+          </div>
+          <div class="product-status">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 1px;">● Active</span>
+            <button class="btn btn-danger">Revoke</button>
+          </div>
+        </div>
+        <div class="product-body">
+          <div class="product-body-col">
+            <h5>Approved scopes</h5>
+            <div class="scope-row">Gmail</div>
+            <div class="scope-row">Calendar</div>
+            <div class="scope-row">Notion</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Can read</h5>
+            <div class="scope-row">Recent emails</div>
+            <div class="scope-row">Calendar availability</div>
+            <div class="scope-row">Notion candidate notes</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Can write (with approval)</h5>
+            <div class="scope-row">Schedule interviews</div>
+            <div class="scope-row">Draft outreach emails</div>
+          </div>
+        </div>
+        <div class="product-foot">
+          <span>Last action: yesterday — calendar.create_event</span>
+          <span>52 actions in last 30 days</span>
+        </div>
+      </div>
+
+      <div class="product">
+        <div class="product-head">
+          <div class="product-info">
+            <div class="product-icon">S</div>
+            <div>
+              <div class="product-name">SalesAI</div>
+              <div class="product-detail">salesai.com · approved May 02, 2026</div>
+            </div>
+          </div>
+          <div class="product-status">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); text-transform: uppercase; letter-spacing: 1px;">● Active</span>
+            <button class="btn btn-danger">Revoke</button>
+          </div>
+        </div>
+        <div class="product-body">
+          <div class="product-body-col">
+            <h5>Approved scopes</h5>
+            <div class="scope-row">Gmail</div>
+            <div class="scope-row">Notion</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Can read</h5>
+            <div class="scope-row">Sent email history</div>
+            <div class="scope-row">Notion CRM pages</div>
+          </div>
+          <div class="product-body-col">
+            <h5>Requires approval each time</h5>
+            <div class="scope-row">Send email to new contacts</div>
+            <div class="scope-row">Update Notion records</div>
+          </div>
+        </div>
+        <div class="product-foot">
+          <span>Last action: 3 days ago — gmail.search</span>
+          <span>18 actions in last 30 days</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== AUDIT VIEW ========== -->
+    <div class="topbar" data-topbar="audit" style="display:none;">
+      <div class="topbar-title">
+        <h1>Audit log</h1>
+        <span class="breadcrumb">last 30 days · 317 events</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="content view" data-view="audit">
+
+      <div class="audit-filters">
+        <button class="audit-filter active">All events</button>
+        <button class="audit-filter">Orchestrator</button>
+        <button class="audit-filter">Recruiting Copilot</button>
+        <button class="audit-filter">SalesAI</button>
+        <button class="audit-filter">Failed only</button>
+      </div>
+
+      <div class="audit-table">
+        <div class="audit-row head">
+          <span>Time</span>
+          <span>Product</span>
+          <span>Action</span>
+          <span>App</span>
+          <span style="text-align:right;">Result</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">14m ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">sent <strong>gmail.send_email</strong> to 1 recipient</span>
+          <span class="audit-app">Gmail</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">22m ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">read <strong>calendar.list_events</strong> for today</span>
+          <span class="audit-app">Calendar</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">1h ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">read <strong>notion.search_pages</strong> q="Q2 plan"</span>
+          <span class="audit-app">Notion</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">3h ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">created <strong>linear.create_issue</strong> in Product Team</span>
+          <span class="audit-app">Linear</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">yesterday</span>
+          <span class="audit-product">Recruiting Copilot</span>
+          <span class="audit-action">created <strong>calendar.create_event</strong> with 2 attendees</span>
+          <span class="audit-app">Calendar</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">yesterday</span>
+          <span class="audit-product">Recruiting Copilot</span>
+          <span class="audit-action">attempted <strong>gmail.send_email</strong> — outside approved domains</span>
+          <span class="audit-app">Gmail</span>
+          <span class="audit-result fail">Blocked</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">2d ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">read <strong>github.list_pull_requests</strong> repo=api</span>
+          <span class="audit-app">GitHub</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">3d ago</span>
+          <span class="audit-product">SalesAI</span>
+          <span class="audit-action">read <strong>gmail.search</strong> q="from:lead@*"</span>
+          <span class="audit-app">Gmail</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">3d ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">posted <strong>slack.send_message</strong> to #engineering</span>
+          <span class="audit-app">Slack</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">4d ago</span>
+          <span class="audit-product">Recruiting Copilot</span>
+          <span class="audit-action">read <strong>notion.get_page</strong> id=cand_2871</span>
+          <span class="audit-app">Notion</span>
+          <span class="audit-result">OK</span>
+        </div>
+
+        <div class="audit-row">
+          <span class="audit-time">5d ago</span>
+          <span class="audit-product">Orchestrator</span>
+          <span class="audit-action">requested <strong>passport.approve_set</strong> "Engineering Stack"</span>
+          <span class="audit-app">Passport</span>
+          <span class="audit-result">Approved</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.sb-link[data-view]').forEach(link => {
+    link.addEventListener('click', () => {
+      const target = link.dataset.view;
+      document.querySelectorAll('.sb-link[data-view]').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelector(`.view[data-view="${target}"]`).classList.add('active');
+      document.querySelectorAll('.topbar').forEach(t => t.style.display = 'none');
+      document.querySelector(`.topbar[data-topbar="${target}"]`).style.display = 'flex';
+    });
+  });
+
+  // Audit filter chips
+  document.querySelectorAll('.audit-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.audit-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

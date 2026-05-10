@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Passport — Before / After</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #F2EDE3;
+    --paper-deep:   #E8DFC8;
+    --paper-card:   #ECE5D5;
+    --ink:          #1A1816;
+    --ink-soft:     #5C544A;
+    --ink-faint:    #8A7E6E;
+    --stamp:        #A03B2A;
+    --stamp-soft:   #C25946;
+    --rule:         #C7BDAB;
+    --rule-soft:    #DACFB9;
+    --green:        #4D6B3F;
+    --grey:         #9A9183;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #2A2520 0%, #1A1816 100%);
+    color: var(--ink);
+    font-family: 'Instrument Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 56px 32px;
+  }
+
+  /* Outer page label */
+  .meta {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .doc-title {
+    text-align: center;
+    color: var(--paper);
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .doc-sub {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.55);
+    font-size: 14px;
+    margin-bottom: 56px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* The hero image — what gets screenshotted for Twitter (1600x900 region) */
+  .hero {
+    width: 1600px;
+    max-width: calc(100vw - 64px);
+    aspect-ratio: 16 / 9;
+    background: var(--paper);
+    border-radius: 12px;
+    box-shadow: 0 24px 80px -8px rgba(0,0,0,0.5);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  /* Subtle paper grain */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Side panels */
+  .side {
+    padding: 56px 56px 48px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+  }
+  .side.before {
+    background: var(--paper);
+    border-right: 1px dashed var(--rule);
+  }
+  .side.after {
+    background: var(--paper-deep);
+  }
+
+  /* Side label */
+  .side-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    width: fit-content;
+  }
+  .side.before .side-label {
+    color: var(--ink-faint);
+  }
+  .side.before .side-label::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--ink-faint);
+  }
+  .side.after .side-label {
+    color: var(--stamp);
+    font-weight: 600;
+  }
+  .side.after .side-label::before {
+    content: '';
+    width: 22px;
+    height: 2px;
+    background: var(--stamp);
+  }
+
+  /* Main side headline */
+  .side h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 44px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+  .side h2 em {
+    font-style: italic;
+    color: var(--stamp);
+  }
+  .side p.lede {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    max-width: 380px;
+    line-height: 1.5;
+  }
+
+  /* Fake app frame in each side */
+  .app-frame {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 20px 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .app-frame::before {
+    content: 'ACME AI · ONBOARDING';
+    position: absolute;
+    top: -8px;
+    left: 18px;
+    background: inherit;
+    padding: 0 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    background: var(--paper-card);
+  }
+  .side.before .app-frame::before { background: var(--paper); }
+  .side.after .app-frame::before { background: var(--paper-deep); }
+
+  /* Onboarding header inside the app frame */
+  .app-head {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .app-head h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .app-head .progress {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--rule-soft);
+    border-radius: 100px;
+    overflow: hidden;
+    max-width: 180px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+  }
+  .side.before .progress-bar-fill {
+    width: 0%;
+    background: var(--ink-faint);
+  }
+  .side.after .progress-bar-fill {
+    width: 100%;
+    background: var(--green);
+  }
+
+  /* BEFORE: connection list */
+  .conn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .conn-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .conn-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .conn-item-icon {
+    width: 22px;
+    height: 22px;
+    background: var(--paper-deep);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 11px;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .conn-item-name {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .conn-item-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 100px;
+    color: var(--grey);
+    background: var(--rule-soft);
+  }
+  .btn-connect {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  /* AFTER: the Connect Agent Passport button */
+  .pass-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 8px 0;
+  }
+  .pass-button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 16px 32px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 8px 24px -6px rgba(26, 24, 22, 0.25);
+  }
+  .pass-button .pass-prefix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--paper);
+    background: rgba(232, 223, 200, 0.18);
+    padding: 3px 6px;
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .pass-button .pass-name {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+  }
+  .pass-button .arrow {
+    color: var(--paper-deep);
+  }
+  .pass-helper {
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+  .pass-helper strong {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* The "instant" approval badge */
+  .instant-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(77, 107, 63, 0.1);
+    border: 1px solid rgba(77, 107, 63, 0.25);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--green);
+    letter-spacing: 1px;
+    margin-top: 14px;
+  }
+  .instant-badge::before {
+    content: '✓';
+    font-weight: 700;
+  }
+
+  /* Bottom subtitle line on each side */
+  .bottom-line {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--rule);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .side.before .bottom-line { color: var(--ink-faint); }
+  .side.after .bottom-line { color: var(--ink); }
+  .side.after .bottom-line strong { color: var(--stamp); font-style: normal; font-weight: 500; }
+
+  /* Center divider stamp */
+  .center-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 76px;
+    height: 76px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 4px 20px -2px rgba(0,0,0,0.2);
+  }
+  .center-stamp .arrow-big {
+    font-family: 'Instrument Serif', serif;
+    font-size: 30px;
+    font-style: italic;
+    color: var(--stamp);
+    line-height: 1;
+    margin-top: 4px;
+  }
+  .center-stamp .stamp-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+
+  /* Brand corner watermark */
+  .brand-mark {
+    position: absolute;
+    bottom: 18px;
+    right: 22px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 5;
+  }
+  .brand-mark .bm-prefix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--stamp);
+    background: rgba(160, 59, 42, 0.08);
+    padding: 2px 5px;
+    border: 1px solid rgba(160, 59, 42, 0.25);
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .brand-mark .bm-main {
+    font-family: 'Instrument Serif', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .brand-mark .bm-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--stamp);
+    border-radius: 50%;
+  }
+
+  /* Mobile fallback */
+  @media (max-width: 1100px) {
+    .hero {
+      aspect-ratio: auto;
+      grid-template-columns: 1fr;
+    }
+    .side { padding: 36px 32px 32px; }
+    .side h2 { font-size: 32px; }
+    .side.before { border-right: none; border-bottom: 1px dashed var(--rule); }
+    .center-stamp { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="meta">Hero Asset · Before / After Onboarding</div>
+<h1 class="doc-title">The screenshot for Twitter</h1>
+<p class="doc-sub">Crop to 1600 × 900 for the launch tweet. The center stamp is the visual hinge — it tells the reader to read left-to-right.</p>
+
+<div class="hero">
+
+  <!-- BEFORE -->
+  <div class="side before">
+    <span class="side-label">Before Agent Passport</span>
+    <h2>Connect six apps <em>before you start.</em></h2>
+    <p class="lede">Every new AI product makes users do this. Activation craters. Users churn before reaching value.</p>
+
+    <div class="app-frame">
+      <div class="app-head">
+        <h3>Welcome to Acme AI</h3>
+        <div class="progress">
+          <span>0 of 6</span>
+          <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+          <span>connected</span>
+        </div>
+      </div>
+      <div class="conn-list">
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">G</div>
+            <span class="conn-item-name">Gmail</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">C</div>
+            <span class="conn-item-name">Google Calendar</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">S</div>
+            <span class="conn-item-name">Slack</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">N</div>
+            <span class="conn-item-name">Notion</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">G</div>
+            <span class="conn-item-name">GitHub</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+        <div class="conn-item">
+          <div class="conn-item-left">
+            <div class="conn-item-icon">L</div>
+            <span class="conn-item-name">Linear</span>
+          </div>
+          <button class="btn-connect">Connect</button>
+        </div>
+      </div>
+      <div class="bottom-line">Six tabs. Six OAuth flows. Six chances to drop off.</div>
+    </div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="side after">
+    <span class="side-label">With Agent Passport</span>
+    <h2>Connect <em>once.</em><br/>Bring it everywhere.</h2>
+    <p class="lede">One Connect button. Returning users approve a Profile in a click. New users create a Passport that works in the next AI product they use too.</p>
+
+    <div class="app-frame">
+      <div class="app-head">
+        <h3>Welcome to Acme AI</h3>
+        <div class="progress">
+          <span>6 of 6</span>
+          <div class="progress-bar"><div class="progress-bar-fill"></div></div>
+          <span>ready</span>
+        </div>
+      </div>
+      <div class="pass-section">
+        <button class="pass-button">
+          <span class="pass-prefix">AI</span>
+          <span class="pass-name">Connect Passport</span>
+          <span class="arrow">→</span>
+        </button>
+        <div class="pass-helper">Or <strong>sign in</strong> if you already have one</div>
+        <div class="instant-badge">Instant approval — Work profile applied</div>
+      </div>
+      <div class="bottom-line">One button. <strong>Activation, restored.</strong></div>
+    </div>
+  </div>
+
+  <!-- Center stamp -->
+  <div class="center-stamp">
+    <div class="arrow-big">→</div>
+    <div class="stamp-label">VS</div>
+  </div>
+
+  <!-- Brand watermark -->
+  <div class="brand-mark">
+    <span class="bm-prefix">AI</span>
+    <span class="bm-main">Passport</span>
+    <span class="bm-dot"></span>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Passport — Connect UI states</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #F2EDE3;
+    --paper-deep:   #E8DFC8;
+    --paper-card:   #ECE5D5;
+    --ink:          #1A1816;
+    --ink-soft:     #5C544A;
+    --ink-faint:    #8A7E6E;
+    --stamp:        #A03B2A;
+    --stamp-soft:   #C25946;
+    --rule:         #C7BDAB;
+    --rule-soft:    #DACFB9;
+    --green:        #4D6B3F;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #2A2520 0%, #1A1816 100%);
+    color: var(--ink);
+    font-family: 'Instrument Sans', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 60px 24px;
+  }
+  .doc-meta {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .doc-title {
+    text-align: center;
+    color: var(--paper);
+    font-family: 'Instrument Serif', serif;
+    font-size: 40px;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .doc-sub {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.6);
+    font-size: 14px;
+    margin-bottom: 64px;
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* PRIMARY HERO MODAL — for sharing as a single screenshot */
+  .hero-frame {
+    max-width: 480px;
+    margin: 0 auto 80px;
+    background: var(--paper);
+    border-radius: 12px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 24px 60px -8px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .hero-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Header section — passport-style */
+  .modal-header {
+    background: var(--paper-deep);
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+  .modal-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-prefix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--stamp);
+    background: rgba(160, 59, 42, 0.08);
+    padding: 3px 6px;
+    border: 1px solid rgba(160, 59, 42, 0.25);
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .brand-main {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    font-style: italic;
+    line-height: 1;
+  }
+  .brand-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--stamp);
+    border-radius: 50%;
+  }
+  .modal-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+  }
+
+  /* Body */
+  .modal-body {
+    padding: 32px 28px 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Returning user identity */
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--stamp), var(--stamp-soft));
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    font-weight: 500;
+    font-style: italic;
+  }
+  .user-info {
+    flex: 1;
+    line-height: 1.2;
+  }
+  .user-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .user-pid {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+  }
+  .user-action {
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .user-action:hover { color: var(--stamp); }
+
+  /* Headline */
+  .modal-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .modal-headline em {
+    font-style: italic;
+    color: var(--stamp);
+  }
+  .modal-sub {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  /* Profile request block */
+  .profile-block {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .profile-block::before {
+    content: 'PROFILE';
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    background: var(--paper);
+    padding: 0 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--stamp);
+    font-weight: 600;
+  }
+  .profile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .profile-name-big {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .profile-name-big::before {
+    content: '◆';
+    color: var(--stamp);
+    font-size: 12px;
+    font-style: normal;
+  }
+  .profile-switch {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.15s;
+  }
+  .profile-switch:hover {
+    color: var(--stamp);
+    border-color: var(--stamp);
+  }
+  .profile-apps-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .app-pill {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .app-pill::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  /* Permissions list */
+  .perms-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .perms-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule-soft);
+  }
+  .perms-list {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+  .perms-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .perms-list li::before {
+    content: '✓';
+    color: var(--green);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .perms-list li.warn::before {
+    content: '!';
+    color: var(--stamp);
+    background: rgba(160, 59, 42, 0.1);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 14px;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  .perms-list li .perm-note {
+    color: var(--ink-faint);
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .btn-modal {
+    padding: 13px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-deny {
+    background: transparent;
+    color: var(--ink-soft);
+    border-color: var(--rule);
+  }
+  .btn-deny:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .btn-approve {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-approve:hover {
+    background: var(--stamp);
+  }
+
+  /* Footer */
+  .modal-foot {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+    padding-top: 4px;
+  }
+  .modal-foot a {
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .modal-foot a:hover { color: var(--stamp); text-decoration-color: var(--stamp); }
+
+  /* Requesting app strip — at very top of body */
+  .requesting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(160, 59, 42, 0.06);
+    border: 1px solid rgba(160, 59, 42, 0.2);
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+  .req-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    font-style: italic;
+    flex-shrink: 0;
+  }
+  .req-text {
+    flex: 1;
+    line-height: 1.3;
+  }
+  .req-name {
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+  .req-domain {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+  }
+  .req-verified {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--green);
+    background: rgba(77, 107, 63, 0.1);
+    padding: 3px 6px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* SECONDARY STATES — smaller frames below the hero */
+  .states-section {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .states-label {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .states-label::before, .states-label::after {
+    content: '';
+    flex: 1;
+    max-width: 200px;
+    height: 1px;
+    background: rgba(232, 223, 200, 0.2);
+  }
+  .states-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .state-frame {
+    background: var(--paper);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px -8px rgba(0,0,0,0.3);
+  }
+  .state-label {
+    background: rgba(0,0,0,0.85);
+    color: var(--paper);
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .state-body {
+    padding: 22px 22px 24px;
+  }
+  .state-body h3 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .state-body h3 em { font-style: italic; color: var(--stamp); }
+  .state-body p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    line-height: 1.45;
+  }
+  .state-body .small-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 16px;
+  }
+  .state-body .small-pills .app-pill {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  .state-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .state-buttons .btn-modal {
+    padding: 10px 14px;
+    font-size: 12.5px;
+    flex: 1;
+  }
+  .state-success {
+    text-align: center;
+    padding: 32px 22px;
+  }
+  .checkmark {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 16px;
+  }
+
+  /* Mobile */
+  @media (max-width: 760px) {
+    body { padding: 32px 16px; }
+    .doc-title { font-size: 28px; }
+    .hero-frame { margin-bottom: 48px; }
+    .modal-body { padding: 24px 20px; }
+    .modal-headline { font-size: 24px; }
+    .states-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-meta">Demo Reference · Connect UI States</div>
+<h1 class="doc-title">"Connect Agent Passport"</h1>
+<p class="doc-sub">The modal that AI startups embed in their onboarding. This is the magic moment — what users see when they click the Connect Passport button.</p>
+
+<!-- HERO STATE — Returning Passport user approving Acme AI -->
+<div class="hero-frame">
+
+  <div class="modal-header">
+    <div class="modal-brand">
+      <span class="brand-prefix">AI</span>
+      <span class="brand-main">Passport</span>
+      <span class="brand-dot"></span>
+    </div>
+    <div class="modal-meta">SECURE</div>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="requesting">
+      <div class="req-icon">A</div>
+      <div class="req-text">
+        <div class="req-name">Acme AI</div>
+        <div class="req-domain">acme.ai · is requesting access</div>
+      </div>
+      <span class="req-verified">Verified</span>
+    </div>
+
+    <h2 class="modal-headline">Approve <em>Work</em> for Acme AI?</h2>
+    <p class="modal-sub">Acme AI will be able to act inside the apps in this profile, on your behalf.</p>
+
+    <div class="user-row">
+      <div class="avatar">A</div>
+      <div class="user-info">
+        <div class="user-name">Alice Park</div>
+        <div class="user-pid">pp_27a4_b9c1f</div>
+      </div>
+      <div class="user-action">Switch account</div>
+    </div>
+
+    <div class="profile-block">
+      <div class="profile-row">
+        <div class="profile-name-big">Work</div>
+        <span class="profile-switch">Change profile</span>
+      </div>
+      <div class="profile-apps-row">
+        <span class="app-pill">Gmail</span>
+        <span class="app-pill">Calendar</span>
+        <span class="app-pill">Slack</span>
+        <span class="app-pill">Notion</span>
+        <span class="app-pill">Linear</span>
+      </div>
+    </div>
+
+    <div class="perms-label">Acme AI will be able to</div>
+    <ul class="perms-list">
+      <li>Read your Gmail messages</li>
+      <li>Send email <span class="perm-note">— shows preview before sending</span></li>
+      <li>Read your calendar</li>
+      <li>Create calendar events</li>
+      <li>Send messages in Slack</li>
+      <li>Read pages from Notion</li>
+      <li class="warn">Cannot delete or modify existing data</li>
+    </ul>
+
+    <div class="btn-row">
+      <button class="btn-modal btn-deny">Deny</button>
+      <button class="btn-modal btn-approve">Approve access</button>
+    </div>
+
+    <div class="modal-foot">
+      <a>Edit what's allowed</a> · <a>Audit log</a> · <a>What is Agent Passport?</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECONDARY STATES -->
+<div class="states-section">
+  <div class="states-label">Other states · for reference</div>
+
+  <div class="states-grid">
+
+    <!-- State A: First-time user -->
+    <div class="state-frame">
+      <div class="state-label">State A · First-time user</div>
+      <div class="state-body">
+        <div class="requesting" style="margin-bottom: 16px;">
+          <div class="req-icon">A</div>
+          <div class="req-text">
+            <div class="req-name">Acme AI</div>
+            <div class="req-domain">acme.ai</div>
+          </div>
+        </div>
+        <h3>Create your <em>Agent Passport</em></h3>
+        <p>Connect your apps once. Use them in Acme AI and any other AI product that supports Passport.</p>
+        <div class="perms-label" style="margin-bottom: 8px;">Acme AI is requesting</div>
+        <div class="small-pills">
+          <span class="app-pill">Gmail</span>
+          <span class="app-pill">Calendar</span>
+          <span class="app-pill">Slack</span>
+          <span class="app-pill">Notion</span>
+        </div>
+        <div class="state-buttons">
+          <button class="btn-modal btn-deny">Sign in</button>
+          <button class="btn-modal btn-approve">Create Passport</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- State B: First-time, after creation, scope confirm -->
+    <div class="state-frame">
+      <div class="state-label">State B · Scope confirm</div>
+      <div class="state-body">
+        <div class="user-row" style="margin-bottom: 16px;">
+          <div class="avatar">A</div>
+          <div class="user-info">
+            <div class="user-name">Alice Park</div>
+            <div class="user-pid">pp_27a4_b9c1f</div>
+          </div>
+        </div>
+        <h3>Acme AI wants to <em>send email</em> on your behalf</h3>
+        <p>You can revoke this access at any time from your Passport dashboard.</p>
+        <ul class="perms-list" style="margin-bottom: 14px;">
+          <li>Read Gmail messages</li>
+          <li>Send email</li>
+          <li>Read calendar</li>
+        </ul>
+        <div class="state-buttons">
+          <button class="btn-modal btn-deny">Deny</button>
+          <button class="btn-modal btn-approve">Approve</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- State C: Success -->
+    <div class="state-frame">
+      <div class="state-label">State C · Approved</div>
+      <div class="state-body state-success">
+        <div class="checkmark">✓</div>
+        <h3>You're <em>connected.</em></h3>
+        <p>Acme AI can now use your Work profile. Returning to the app…</p>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-faint); margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--rule);">
+          Manage at passport.so · Receipt sent to alice@company.com
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

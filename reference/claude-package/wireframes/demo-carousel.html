@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Passport — Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #F2EDE3;
+    --paper-deep:   #E8DFC8;
+    --paper-card:   #ECE5D5;
+    --ink:          #1A1816;
+    --ink-soft:     #5C544A;
+    --ink-faint:    #8A7E6E;
+    --stamp:        #A03B2A;
+    --stamp-soft:   #C25946;
+    --rule:         #C7BDAB;
+    --rule-soft:    #DACFB9;
+    --green:        #4D6B3F;
+    --grey:         #9A9183;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: linear-gradient(135deg, #2A2520 0%, #1A1816 100%);
+    color: var(--ink);
+    font-family: 'Instrument Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    padding: 56px 32px 80px;
+  }
+
+  /* Page chrome */
+  .meta {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .doc-title {
+    text-align: center;
+    color: var(--paper);
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .doc-sub {
+    text-align: center;
+    color: rgba(232, 223, 200, 0.55);
+    font-size: 14px;
+    margin-bottom: 64px;
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+
+  /* Carousel layout — each slide stacked, with label */
+  .slide-wrap {
+    max-width: 540px;
+    margin: 0 auto 56px;
+  }
+  .slide-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: rgba(232, 223, 200, 0.5);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  .slide-label .num {
+    color: var(--stamp-soft);
+    font-weight: 600;
+  }
+
+  /* The slide itself — 1080x1350 internally, scaled down for preview */
+  .slide {
+    width: 540px;       /* preview at 50% of 1080 */
+    height: 675px;      /* preview at 50% of 1350 */
+    background: var(--paper);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 60px -8px rgba(0,0,0,0.4);
+    /* When exporting, set transform: scale(2) on the inner content for full 1080x1350 */
+  }
+  .slide-inner {
+    position: absolute;
+    inset: 0;
+    padding: 72px 56px;
+    display: flex;
+    flex-direction: column;
+    /* All children sized at half of full slide for preview */
+  }
+  /* Paper grain overlay */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .slide-inner > * { position: relative; z-index: 2; }
+
+  /* Brand mark on every slide */
+  .slide-brand {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: auto;
+  }
+  .sb-prefix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.3px;
+    color: var(--stamp);
+    background: rgba(160, 59, 42, 0.08);
+    padding: 3px 5px;
+    border: 1px solid rgba(160, 59, 42, 0.25);
+    border-radius: 2px;
+    line-height: 1;
+  }
+  .sb-main {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 1;
+  }
+  .sb-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--stamp);
+    border-radius: 50%;
+  }
+
+  /* Slide footer — page indicator */
+  .slide-foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+  }
+  .slide-foot .swipe {
+    color: var(--stamp);
+    font-weight: 600;
+  }
+
+  /* Big headline type */
+  .big-serif {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
+  }
+  .big-serif em { font-style: italic; color: var(--stamp); }
+
+  /* Slide 1 — Hook */
+  .slide-1 .big-serif {
+    font-size: 52px;
+    margin-top: 80px;
+  }
+
+  /* Slide 2 — Parallel question */
+  .slide-2 {
+    background: var(--paper-deep);
+  }
+  .slide-2 .big-serif {
+    font-size: 50px;
+    margin-top: 60px;
+  }
+  .slide-2 .red-stripe {
+    width: 72px;
+    height: 3px;
+    background: var(--stamp);
+    margin-bottom: 24px;
+  }
+
+  /* Slide 3 — OAuth wall visualized */
+  .slide-3 .big-serif {
+    font-size: 36px;
+    margin-bottom: 28px;
+  }
+  .oauth-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .oauth-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+  }
+  .oc-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .oc-icon {
+    width: 22px;
+    height: 22px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 11px;
+    font-style: italic;
+    color: var(--ink-faint);
+  }
+  .oc-name {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .oc-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--grey);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .slide-3 .caption {
+    margin-top: 22px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--stamp);
+    line-height: 1.2;
+  }
+
+  /* Slide 4 — Familiar pattern */
+  .slide-4 .big-serif {
+    font-size: 36px;
+    margin-bottom: 36px;
+  }
+  .pattern-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .pattern-pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px;
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+  }
+  .pp-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .pp-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .pp-pill {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .slide-4 .caption {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .slide-4 .caption em { color: var(--stamp); }
+
+  /* Slide 5 — The moment */
+  .slide-5 {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .slide-5 .slide-brand .sb-main { color: var(--paper); }
+  .slide-5 .slide-foot { color: rgba(232, 223, 200, 0.5); }
+  .slide-5 .slide-foot .swipe { color: var(--stamp-soft); }
+  .slide-5 .moment-wrap {
+    margin: auto 0;
+    text-align: center;
+  }
+  .slide-5 .big-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .slide-5 .bs-prefix {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: var(--paper);
+    background: var(--stamp);
+    padding: 8px 12px;
+    border-radius: 3px;
+    line-height: 1;
+  }
+  .slide-5 .bs-main {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px;
+    font-style: italic;
+    line-height: 1;
+    color: var(--paper);
+  }
+  .slide-5 .moment-tag {
+    font-family: 'Instrument Serif', serif;
+    font-size: 38px;
+    font-style: italic;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .slide-5 .moment-tag em { color: var(--stamp-soft); font-style: italic; }
+  .slide-5 .moment-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(232, 223, 200, 0.6);
+  }
+
+  /* Slide 6 — User proof */
+  .slide-6 .big-serif {
+    font-size: 32px;
+    margin-bottom: 22px;
+  }
+  .mini-dash {
+    background: var(--paper-card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .md-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .md-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    font-style: italic;
+  }
+  .md-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--green);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .md-status::before {
+    content: '● ';
+  }
+  .md-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .md-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 3px 8px;
+    border-radius: 100px;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .md-pill::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .md-pill.profile {
+    background: var(--stamp);
+    color: var(--paper);
+    border-color: var(--stamp);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+  .md-pill.profile::before { display: none; }
+  .md-foot {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule);
+  }
+  .slide-6 .caption {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.35;
+    color: var(--ink-soft);
+  }
+
+  /* Slide 7 — CTA */
+  .slide-7 {
+    background: var(--paper-deep);
+  }
+  .slide-7 .cta-wrap {
+    margin: auto 0;
+    text-align: center;
+  }
+  .slide-7 .cta-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--stamp);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .slide-7 .cta-headline {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1.05;
+    margin-bottom: 28px;
+  }
+  .slide-7 .cta-headline em { font-style: italic; color: var(--stamp); }
+  .slide-7 .cta-points {
+    list-style: none;
+    text-align: left;
+    margin: 0 auto 36px;
+    max-width: 280px;
+  }
+  .slide-7 .cta-points li {
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+    font-size: 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .slide-7 .cta-points li:last-child { border-bottom: none; }
+  .slide-7 .cta-points li::before {
+    content: '◆';
+    color: var(--stamp);
+    font-size: 9px;
+  }
+  .slide-7 .cta-url {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 24px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+  }
+</style>
+</head>
+<body>
+
+<div class="meta">Carousel · 7 Slides · Instagram + LinkedIn + Twitter</div>
+<h1 class="doc-title">The carousel</h1>
+<p class="doc-sub">Each slide is sized for 1080×1350 export. Preview shown at 50%. The same seven slides post whole on Instagram, slice into a Twitter image carousel, and stack as a PDF for LinkedIn document upload — where document posts currently outperform regular images on reach.</p>
+
+<!-- SLIDE 1 — HOOK -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">01 / 07</span><span>HOOK · APPLE PAY PRECEDENT</span></div>
+  <div class="slide slide-1">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+      <div class="big-serif">
+        Apple Pay didn't make you<br/>
+        <em>re-enter your card</em><br/>
+        every time.
+      </div>
+      <div class="slide-foot">
+        <span>01 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2 — PARALLEL QUESTION -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">02 / 07</span><span>PARALLEL QUESTION</span></div>
+  <div class="slide slide-2">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+      <div class="red-stripe" style="margin-top: 60px;"></div>
+      <div class="big-serif">
+        So why does every<br/>
+        AI agent still make<br/>
+        <em>your users reconnect</em><br/>
+        Gmail every time?
+      </div>
+      <div class="slide-foot">
+        <span>02 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 — THE WALL -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">03 / 07</span><span>THE PAIN VISUALIZED</span></div>
+  <div class="slide slide-3">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+      <div class="big-serif" style="margin-top: 32px;">Every new AI app makes<br/>your users do this:</div>
+
+      <div class="oauth-stack">
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">G</div><span class="oc-name">Connect Gmail</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">C</div><span class="oc-name">Connect Calendar</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">S</div><span class="oc-name">Connect Slack</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">N</div><span class="oc-name">Connect Notion</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">G</div><span class="oc-name">Connect GitHub</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+        <div class="oauth-card">
+          <div class="oc-left"><div class="oc-icon">L</div><span class="oc-name">Connect Linear</span></div>
+          <span class="oc-status">Not connected</span>
+        </div>
+      </div>
+
+      <div class="caption">The new login tax.</div>
+
+      <div class="slide-foot">
+        <span>03 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 — FAMILIAR PATTERN -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">04 / 07</span><span>YOU ALREADY KNOW HOW THIS IS SOLVED</span></div>
+  <div class="slide slide-4">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+      <div class="big-serif" style="margin-top: 32px;">You already know<br/>how this is solved.</div>
+
+      <div class="pattern-row">
+        <div class="pattern-pill">
+          <div class="pp-mark">A</div>
+          <div class="pp-name">Apple Pay</div>
+          <div class="pp-pill">checkout</div>
+        </div>
+        <div class="pattern-pill">
+          <div class="pp-mark">L</div>
+          <div class="pp-name">Link</div>
+          <div class="pp-pill">payments</div>
+        </div>
+        <div class="pattern-pill">
+          <div class="pp-mark">S</div>
+          <div class="pp-name">Shop Pay</div>
+          <div class="pp-pill">e-commerce</div>
+        </div>
+      </div>
+
+      <div class="caption">Same pattern.<br/><em>New category.</em></div>
+
+      <div class="slide-foot">
+        <span>04 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 — THE MOMENT -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">05 / 07</span><span>THE BRAND MOMENT</span></div>
+  <div class="slide slide-5">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main" style="color: var(--paper);">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+
+      <div class="moment-wrap">
+        <div class="big-stamp">
+          <span class="bs-prefix">AI</span>
+          <span class="bs-main">Passport</span>
+        </div>
+        <div class="moment-tag">
+          Connect once.<br/>
+          <em>Bring it everywhere.</em>
+        </div>
+        <div class="moment-sub">Portable app access for AI products</div>
+      </div>
+
+      <div class="slide-foot">
+        <span>05 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 — USER PROOF -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">06 / 07</span><span>FOR USERS · DASHBOARD PROOF</span></div>
+  <div class="slide slide-6">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+
+      <div class="big-serif" style="margin-top: 32px;">One place. Every AI<br/>product. <em>Every action,<br/>logged.</em></div>
+
+      <div class="mini-dash">
+        <div class="md-head">
+          <div class="md-name">Orchestrator</div>
+          <div class="md-status">Active</div>
+        </div>
+        <div class="md-row">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-soft);">Using profile:</span>
+          <span class="md-pill profile">Work</span>
+        </div>
+        <div class="md-row" style="margin-top: 8px;">
+          <span class="md-pill">Gmail</span>
+          <span class="md-pill">Calendar</span>
+          <span class="md-pill">Slack</span>
+          <span class="md-pill">Notion</span>
+        </div>
+        <div class="md-foot">Last action: 14m ago — gmail.send_email</div>
+      </div>
+
+      <div class="caption">Revoke any AI product, any connection,<br/>or your whole Passport — in one click.</div>
+
+      <div class="slide-foot">
+        <span>06 / 07</span>
+        <span class="swipe">SWIPE →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 — CTA -->
+<div class="slide-wrap">
+  <div class="slide-label"><span class="num">07 / 07</span><span>CALL TO ACTION</span></div>
+  <div class="slide slide-7">
+    <div class="slide-inner">
+      <div class="slide-brand">
+        <span class="sb-prefix">AI</span>
+        <span class="sb-main">Passport</span>
+        <span class="sb-dot"></span>
+      </div>
+
+      <div class="cta-wrap">
+        <div class="cta-tag">Shipping today</div>
+        <div class="cta-headline">Free during<br/><em>beta.</em></div>
+        <ul class="cta-points">
+          <li>5-line SDK</li>
+          <li>9,000 + apps</li>
+          <li>MCP gateway built in</li>
+          <li>Open spec, provider-neutral</li>
+        </ul>
+        <div class="cta-url">passport.orchestrator.so</div>
+      </div>
+
+      <div class="slide-foot">
+        <span>07 / 07</span>
+        <span style="color: var(--stamp); font-weight: 600;">FIN</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
