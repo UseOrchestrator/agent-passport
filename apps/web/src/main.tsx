@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -23,6 +24,13 @@ const faqs = [
 ];
 
 function App() {
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitted(true);
+  }
+
   return (
     <main>
       <section className="hero">
@@ -202,19 +210,57 @@ function App() {
               partners, not pretending the full platform is already finished.
             </p>
           </div>
-          <form className="waitlistForm">
+          <form className="waitlistForm" onSubmit={handleSubmit}>
             <label>
               Work email
-              <input type="email" name="email" placeholder="you@company.com" />
+              <input required type="email" name="email" placeholder="you@company.com" />
+            </label>
+            <label>
+              Company or project
+              <input required name="company" placeholder="Acme AI" />
+            </label>
+            <label>
+              Current connection provider
+              <select required name="provider" defaultValue="">
+                <option value="" disabled>
+                  Select one
+                </option>
+                <option>Composio</option>
+                <option>Arcade</option>
+                <option>Nango</option>
+                <option>Pipedream</option>
+                <option>Zapier</option>
+                <option>Custom OAuth</option>
+                <option>Not using one yet</option>
+              </select>
             </label>
             <label>
               What are you building?
               <textarea
+                required
                 name="context"
                 placeholder="AI sales agent, recruiting assistant, ops copilot..."
               />
             </label>
-            <button type="button">Request access</button>
+            <label>
+              Biggest connection pain
+              <textarea
+                required
+                name="pain"
+                placeholder="Users drop during setup, revocation UX, too many OAuth screens..."
+              />
+            </label>
+            <label className="checkRow">
+              <input type="checkbox" name="callOptIn" />
+              <span>I am open to a 15-minute discovery call.</span>
+            </label>
+            <button type="submit">Request access</button>
+            {submitted ? (
+              <p className="formSuccess">
+                Request noted for this preview. Production persistence is the
+                next implementation step.
+              </p>
+            ) : null}
           </form>
         </div>
       </section>
