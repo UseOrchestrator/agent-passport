@@ -60,3 +60,18 @@ agent-passport/apps/web
 
 This keeps the validation page and future backend separate from Orchestrator.
 
+## Waitlist Persistence
+
+Use a dedicated table for discovery submissions:
+
+```text
+public.agent_passport_waitlist
+```
+
+Migration:
+
+```text
+agent-passport/supabase/migrations/20260510_agent_passport_waitlist.sql
+```
+
+The validation page posts directly to Supabase using the public anon key and an insert-only RLS policy. This keeps the first validation surface simple while preserving the option to add a backend/API later.

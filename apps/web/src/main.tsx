@@ -5,6 +5,8 @@ import './styles.css';
 
 const apps = ['Gmail', 'Slack', 'Notion', 'Calendar', 'GitHub', 'Linear'];
 const providers = ['Composio', 'Arcade', 'Nango', 'Pipedream'];
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const faqs = [
   {
     question: 'Is this a Composio replacement?',
@@ -24,11 +26,60 @@ const faqs = [
 ];
 
 function App() {
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
+    'idle',
+  );
+  const [message, setMessage] = useState('');
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setStatus('loading');
+    setMessage('');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setStatus('error');
+      setMessage('Waitlist storage is not configured in this environment yet.');
+      return;
+    }
+
+    const form = new FormData(event.currentTarget);
+    const payload = {
+      email: String(form.get('email') || ''),
+      company: String(form.get('company') || ''),
+      provider: String(form.get('provider') || ''),
+      building: String(form.get('context') || ''),
+      pain: String(form.get('pain') || ''),
+      call_opt_in: form.get('callOptIn') === 'on',
+      source: 'agent-passport',
+    };
+
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/agent_passport_waitlist`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error('This email is already on the Agent Passport waitlist.');
+        }
+
+        throw new Error('The waitlist request could not be saved.');
+      }
+
+      event.currentTarget.reset();
+      setStatus('success');
+      setMessage('Request received. We will use this to qualify discovery calls.');
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : 'Something went wrong.');
+    }
   }
 
   return (
@@ -254,11 +305,12 @@ function App() {
               <input type="checkbox" name="callOptIn" />
               <span>I am open to a 15-minute discovery call.</span>
             </label>
-            <button type="submit">Request access</button>
-            {submitted ? (
-              <p className="formSuccess">
-                Request noted for this preview. Production persistence is the
-                next implementation step.
+            <button type="submit" disabled={status === 'loading'}>
+              {status === 'loading' ? 'Submitting...' : 'Request access'}
+            </button>
+            {message ? (
+              <p className={status === 'error' ? 'formError' : 'formSuccess'}>
+                {message}
               </p>
             ) : null}
           </form>

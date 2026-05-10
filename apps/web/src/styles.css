@@ -130,6 +130,11 @@ h2 {
   background: #161616;
 }
 
+.waitlistForm button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
 .productShot {
   overflow: hidden;
   border: 1px solid rgba(22, 22, 22, 0.16);
@@ -431,6 +436,13 @@ h2 {
 .formSuccess {
   margin: 0;
   color: #20705b;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.formError {
+  margin: 0;
+  color: #a13b2f;
   font-weight: 750;
   line-height: 1.45;
 }
