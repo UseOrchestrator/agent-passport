@@ -62,6 +62,43 @@ This keeps the validation page and future backend separate from Orchestrator.
 
 ## Waitlist Persistence
 
+Use a new Supabase project for Agent Passport.
+
+Do not use Orchestrator's existing Supabase project for the validation launch.
+
+Reason:
+
+- Agent Passport is a separate product surface.
+- It will likely need its own users, waitlist, passport profiles, provider references, audit logs, and future backend tables.
+- Reusing Orchestrator's database would create clutter and accidental coupling.
+- Shared identity can be revisited later if we intentionally want Orchestrator SSO or account linking.
+
+Current boundary:
+
+```text
+Agent Passport
+  -> own Vercel project
+  -> own Supabase project
+  -> own env vars
+  -> own tables
+  -> passport.orchestrator.so
+```
+
+Shared:
+
+```text
+Orchestrator brand/domain
+```
+
+Not shared for validation:
+
+```text
+Orchestrator users
+Orchestrator app tables
+Orchestrator backend
+Orchestrator marketing app
+```
+
 Use a dedicated table for discovery submissions:
 
 ```text
