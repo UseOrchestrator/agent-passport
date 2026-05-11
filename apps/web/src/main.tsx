@@ -6,6 +6,26 @@ import './styles.css';
 
 const apps = ['Gmail', 'Slack', 'Notion', 'Calendar', 'GitHub', 'Linear'];
 const providers = ['Composio', 'Arcade', 'Nango', 'Pipedream'];
+const providerOptions = [
+  'Composio',
+  'Arcade',
+  'Nango',
+  'Pipedream',
+  'Custom OAuth',
+  'Not sure yet',
+];
+const buildingOptions = [
+  'Internal agent',
+  'Customer-facing agent',
+  'Vertical SaaS',
+  'Developer tool',
+];
+const painOptions = [
+  'Too many OAuth screens',
+  'Users drop off',
+  'Hard to manage access',
+  'Provider lock-in',
+];
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const faqs = [
@@ -38,6 +58,7 @@ function App() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus('loading');
     setMessage('');
 
@@ -48,13 +69,16 @@ function App() {
       return;
     }
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
+    const buildingPreset = String(form.get('buildingPreset') || '');
+    const buildingDetail = String(form.get('buildingDetail') || '');
+    const painPreset = String(form.get('painPreset') || '');
+    const painDetail = String(form.get('painDetail') || '');
     const payload = {
       email: String(form.get('email') || ''),
-      company: String(form.get('company') || ''),
       provider: String(form.get('provider') || ''),
-      building: String(form.get('context') || ''),
-      pain: String(form.get('pain') || ''),
+      building: [buildingPreset, buildingDetail].filter(Boolean).join(' — '),
+      pain: [painPreset, painDetail].filter(Boolean).join(' — '),
       call_opt_in: form.get('callOptIn') === 'on',
       source: 'agent-passport',
     };
@@ -79,9 +103,9 @@ function App() {
         throw new Error('The waitlist request could not be saved.');
       }
 
-      event.currentTarget.reset();
+      formElement.reset();
       setStatus('success');
-      setMessage('Request received. We will use this to qualify discovery calls.');
+      setMessage('You are on the Agent Passport waitlist.');
       track('agent_passport_form_submitted', {
         provider: payload.provider,
         call_opt_in: payload.call_opt_in,
@@ -287,47 +311,57 @@ function App() {
               Work email
               <input required type="email" name="email" placeholder="you@company.com" />
             </label>
-            <label>
-              Company or project
-              <input required name="company" placeholder="Acme AI" />
-            </label>
-            <label>
-              Current connection provider
-              <select required name="provider" defaultValue="">
-                <option value="" disabled>
-                  Select one
-                </option>
-                <option>Composio</option>
-                <option>Arcade</option>
-                <option>Nango</option>
-                <option>Pipedream</option>
-                <option>Zapier</option>
-                <option>Custom OAuth</option>
-                <option>Not using one yet</option>
-              </select>
-            </label>
-            <label>
-              What are you building?
-              <textarea
-                required
-                name="context"
-                placeholder="AI sales agent, recruiting assistant, ops copilot..."
+
+            <fieldset>
+              <legend>Connection provider</legend>
+              <div className="chipGrid providerChips">
+                {providerOptions.map((option) => (
+                  <label className="choiceChip" key={option}>
+                    <input required type="radio" name="provider" value={option} />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>What are you building?</legend>
+              <div className="chipGrid">
+                {buildingOptions.map((option) => (
+                  <label className="choiceChip" key={option}>
+                    <input required type="radio" name="buildingPreset" value={option} />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+              <input
+                name="buildingDetail"
+                placeholder="Optional: AI sales agent, legal copilot..."
               />
-            </label>
-            <label>
-              Biggest connection pain
-              <textarea
-                required
-                name="pain"
-                placeholder="Users drop during setup, revocation UX, too many OAuth screens..."
+            </fieldset>
+
+            <fieldset>
+              <legend>Biggest connection pain</legend>
+              <div className="chipGrid">
+                {painOptions.map((option) => (
+                  <label className="choiceChip" key={option}>
+                    <input required type="radio" name="painPreset" value={option} />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+              <input
+                name="painDetail"
+                placeholder="Optional: add a sentence if there is more context"
               />
-            </label>
+            </fieldset>
+
             <label className="checkRow">
               <input type="checkbox" name="callOptIn" />
               <span>I am open to a 15-minute discovery call.</span>
             </label>
             <button type="submit" disabled={status === 'loading'}>
-              {status === 'loading' ? 'Submitting...' : 'Request access'}
+              {status === 'loading' ? 'Submitting...' : 'Join waitlist'}
             </button>
             {message ? (
               <p className={status === 'error' ? 'formError' : 'formSuccess'}>
