@@ -58,6 +58,7 @@ function App() {
   const [heroMessage, setHeroMessage] = useState('');
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [selectedPains, setSelectedPains] = useState<string[]>([]);
+  const [repoStars, setRepoStars] = useState<number | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const fadeUp = shouldReduceMotion
     ? {}
@@ -70,6 +71,33 @@ function App() {
 
   useEffect(() => {
     track('agent_passport_page_viewed');
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    fetch('https://api.github.com/repos/ObiTracks/agent-passport')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('GitHub repo metadata unavailable');
+        }
+
+        return response.json() as Promise<{ stargazers_count?: number }>;
+      })
+      .then((repo) => {
+        if (!ignore && typeof repo.stargazers_count === 'number') {
+          setRepoStars(repo.stargazers_count);
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          setRepoStars(null);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -254,7 +282,7 @@ function App() {
                 href="https://github.com/ObiTracks/agent-passport"
                 title="Star Agent Passport on GitHub"
               >
-                GitHub ★
+                GitHub ★ {repoStars ?? ''}
               </a>
             </div>
             <p className="eyebrow">For AI products that need user app access</p>

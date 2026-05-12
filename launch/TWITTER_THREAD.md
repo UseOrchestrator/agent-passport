@@ -13,6 +13,9 @@ Works across provider stacks like Composio, Nango, Arcade, and custom OAuth.
 Join the standard:
 https://passport.orchestrator.so
 
+Repo:
+https://github.com/ObiTracks/agent-passport
+
 ---
 
 Your agent should start with the right apps and tools.

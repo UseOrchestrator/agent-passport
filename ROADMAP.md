@@ -2,22 +2,21 @@
 
 ## Phase 0: Validation
 
-- landing page
-- waitlist
-- positioning
-- open-source README
-- launch assets
-- GitHub repo
-- mobile polish
+- [x] landing page
+- [x] waitlist
+- [x] positioning
+- [x] open-source README
+- [x] launch assets
+- [x] GitHub repo
+- [ ] mobile polish
 
 ## Phase 1: Spec And SDK
 
-- define Passport, Profile, Connection, Provider, Approval, Session, AccessObject
-- publish `@agent-passport/sdk`
-- support session creation
-- support mock access approval
-- return flat provider-aware access objects
-- ship Next.js/Vite examples
+- [x] define Passport, Profile, Connection, Provider, Approval, Session, AccessObject
+- [ ] publish `@agent-passport/sdk`
+- [x] support mock access approval
+- [x] return flat provider-aware access objects
+- [ ] ship Next.js/Vite examples
 
 ## Phase 2: First Provider Adapter
 

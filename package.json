@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "description": "The connection passport for AI apps.",
+  "homepage": "https://passport.orchestrator.so",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ObiTracks/agent-passport.git"
+  },
   "workspaces": [
     "packages/*",
     "examples/*"

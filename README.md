@@ -2,6 +2,9 @@
 
 The connection passport for AI apps.
 
+Website: https://passport.orchestrator.so  
+Repository: https://github.com/ObiTracks/agent-passport
+
 Agent Passport lets users create reusable sets of app connections, then bring the right set into the AI products and agent workflows that need them.
 
 Users should not have to reconnect Gmail, Slack, Calendar, Notion, GitHub, Linear, and the same ten work apps every time they try a new AI product. Builders should not have to rebuild connection setup, scope management, provider handoff, and access revocation from scratch.
@@ -264,20 +267,17 @@ But the standard should be open enough that builders can adopt it without asking
 
 ## Agent-First Contributions
 
-Agent Passport should explore an agent-first contribution model.
+Agent Passport should use an agent-first contribution model.
 
-The idea:
+Bring the idea; let your coding agent make the PR.
 
-- contributors can use AI coding agents to open PRs
-- automated agents run first-pass review
-- maintainers review direction, safety, and product fit
-- small fixes and adapters can move quickly
+Small fixes, examples, adapters, docs, and demos should move quickly.
 
 This fits the project:
 
 > Built for agents. Contributed to by agents.
 
-The rule should not remove human judgment. It should lower contribution friction.
+See [AGENT_CONTRIBUTIONS.md](AGENT_CONTRIBUTIONS.md).
 
 ## First Prototype
 

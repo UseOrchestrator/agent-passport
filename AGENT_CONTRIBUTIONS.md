@@ -1,40 +1,53 @@
-# Agent-First Contributions
+# Agent Contributions
 
-Agent Passport is built for agents, so the project should be easy for agents to contribute to.
+Agent Passport is built for agents, so contributions should be easy to make with agents.
 
-The goal is not to remove human judgment. The goal is to make useful fixes, examples, adapters, and docs move faster.
+The model is simple:
 
-## Model
+- humans bring ideas, bugs, examples, and product taste
+- agents write the code
+- humans or review agents review the PR
+- useful changes should move quickly
 
-- AI agents may open PRs.
-- AI agents may perform first-pass review.
-- Humans approve direction, safety, and merge decisions.
-- Small fixes should be reviewed quickly.
-- Provider adapters and examples should be easy to propose.
+This is inspired by Open Island, the open-source Vibe Island alternative. Their contribution style makes the important point clearly: if you have the will, you can turn an idea into code with an agent and get it used by others.
+
+Agent Passport should work the same way.
+
+## How To Contribute With An Agent
+
+Paste this into Codex, Claude Code, Cursor, or another coding agent:
+
+```text
+I want to contribute to Agent Passport.
+
+Repository: https://github.com/ObiTracks/agent-passport
+
+Read README.md, CONTRIBUTING.md, AGENT_CONTRIBUTIONS.md, and ROADMAP.md.
+Then help me make one focused contribution.
+
+Before editing, tell me:
+- what you plan to change
+- which files you expect to touch
+- how you will test it
+- any obvious limitation or risk
+
+After I approve, make the change, run the relevant check, and open a pull request.
+```
 
 ## Good Agent Tasks
 
 - add an SDK example
-- add a provider adapter stub
-- normalize an access-object edge case
+- add a provider adapter sketch
 - improve README clarity
 - add tests for profile/session behavior
-- generate docs from accepted API types
+- create a small demo
+- add diagrams that explain provider handoff
+- improve mobile UI/accessibility
+- document Composio, Arcade, Nango, Pipedream, or custom OAuth behavior
 
-## Guardrails
+## PR Shape
 
-Agents must not:
-
-- invent provider capabilities
-- claim token portability
-- add secrets
-- bypass human review for security-sensitive code
-- change license or governance rules
-- make large rewrites without an issue/discussion
-
-## PR Format
-
-Agent-generated PRs should include:
+Agent PRs should be short and easy to review:
 
 ```text
 What changed:
@@ -43,11 +56,41 @@ Why:
 
 How tested:
 
-Provider/token assumptions:
-
-Human review needed for:
+Known limitations:
 ```
 
-## Principle
+## Review Shape
 
-Fast contribution is valuable only if the standard stays trustworthy.
+Review should be fast. The first pass should be one of:
+
+```text
+MERGE
+
+REQUEST CHANGES
+
+ESCALATE
+```
+
+Escalate only when the PR touches sensitive areas like credentials, auth, provider behavior, licensing, governance, or major architecture.
+
+## Bug Prompt
+
+```text
+I found a problem in Agent Passport.
+
+Repository: https://github.com/ObiTracks/agent-passport
+
+Help me file a concise GitHub issue. Ask only for details you need.
+Include the problem, steps to reproduce if known, expected behavior, and actual behavior.
+```
+
+## Feature Prompt
+
+```text
+I want to request a feature for Agent Passport.
+
+Repository: https://github.com/ObiTracks/agent-passport
+
+Help me turn this into a concise GitHub issue. Ask only for details you need.
+Include the idea, why it matters, and the smallest useful first version.
+```

@@ -2,6 +2,12 @@
   "name": "@agent-passport/sdk",
   "version": "0.0.0",
   "description": "TypeScript SDK for Agent Passport, the connection passport for AI apps.",
+  "homepage": "https://passport.orchestrator.so",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ObiTracks/agent-passport.git",
+    "directory": "packages/sdk"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

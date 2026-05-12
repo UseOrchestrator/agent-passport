@@ -4,6 +4,8 @@ Agent Passport is the connection passport for AI apps.
 
 We want contributions that make it easier for AI products to request, approve, and use reusable connection profiles.
 
+Agent Passport is agent-first open source. Bring the idea; let your coding agent make the PR.
+
 ## Good First Contributions
 
 - provider adapter sketches
@@ -13,6 +15,21 @@ We want contributions that make it easier for AI products to request, approve, a
 - UI copy improvements
 - demo app improvements
 - issue reproduction cases
+
+## Start With Your Agent
+
+Paste this into Codex, Claude Code, Cursor, or another coding agent:
+
+```text
+I want to contribute to Agent Passport.
+
+Repository: https://github.com/ObiTracks/agent-passport
+
+Read README.md, CONTRIBUTING.md, AGENT_CONTRIBUTIONS.md, and ROADMAP.md.
+Find one small contribution that improves the project.
+Explain the plan before editing.
+Then implement it, run the relevant check, and open a pull request.
+```
 
 ## Contribution Rules
 
@@ -33,24 +50,38 @@ PRs should answer:
 - Does it avoid unsafe credential assumptions?
 - Is the API still understandable?
 
-## Local Setup
+Review should be fast. Small, correct improvements should not wait for days.
 
-The standalone repo is not fully extracted yet. Current source lives under:
+Review agents should return one of:
 
 ```text
-agent-passport/
+MERGE
+REQUEST CHANGES
+ESCALATE
 ```
+
+## Local Setup
+
+Public repo:
+
+https://github.com/ObiTracks/agent-passport
 
 The validation page lives under:
 
 ```text
-agent-passport/apps/web
+apps/web
 ```
 
 Build the page:
 
 ```bash
-cd agent-passport/apps/web
+cd apps/web
 yarn install
 yarn build
+```
+
+When working from the Orchestrator monorepo worktree, the same app lives under:
+
+```text
+agent-passport/apps/web
 ```
