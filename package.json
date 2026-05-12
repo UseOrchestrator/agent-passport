@@ -6,7 +6,7 @@
   "homepage": "https://passport.orchestrator.so",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ObiTracks/agent-passport.git"
+    "url": "git+https://github.com/UseOrchestrator/agent-passport.git"
   },
   "workspaces": [
     "packages/*",

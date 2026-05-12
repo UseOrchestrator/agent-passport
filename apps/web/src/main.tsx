@@ -76,7 +76,7 @@ function App() {
   useEffect(() => {
     let ignore = false;
 
-    fetch('https://api.github.com/repos/ObiTracks/agent-passport')
+    fetch('https://api.github.com/repos/UseOrchestrator/agent-passport')
       .then((response) => {
         if (!response.ok) {
           throw new Error('GitHub repo metadata unavailable');
@@ -279,7 +279,7 @@ function App() {
               <span>Open source</span>
               <span>Connection passport standard</span>
               <a
-                href="https://github.com/ObiTracks/agent-passport"
+                href="https://github.com/UseOrchestrator/agent-passport"
                 title="Star Agent Passport on GitHub"
               >
                 GitHub ★ {repoStars ?? ''}

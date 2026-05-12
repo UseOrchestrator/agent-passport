@@ -23,7 +23,7 @@ Paste this into Codex, Claude Code, Cursor, or another coding agent:
 ```text
 I want to contribute to Agent Passport.
 
-Repository: https://github.com/ObiTracks/agent-passport
+Repository: https://github.com/UseOrchestrator/agent-passport
 
 Read README.md, CONTRIBUTING.md, AGENT_CONTRIBUTIONS.md, and ROADMAP.md.
 Find one small contribution that improves the project.
@@ -64,7 +64,7 @@ ESCALATE
 
 Public repo:
 
-https://github.com/ObiTracks/agent-passport
+https://github.com/UseOrchestrator/agent-passport
 
 The validation page lives under:
 

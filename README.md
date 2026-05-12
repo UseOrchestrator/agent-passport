@@ -3,7 +3,7 @@
 The connection passport for AI apps.
 
 Website: https://passport.orchestrator.so  
-Repository: https://github.com/ObiTracks/agent-passport
+Repository: https://github.com/UseOrchestrator/agent-passport
 
 Agent Passport lets users create reusable sets of app connections, then bring the right set into the AI products and agent workflows that need them.
 

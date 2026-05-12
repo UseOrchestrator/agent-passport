@@ -20,7 +20,7 @@ Paste this into Codex, Claude Code, Cursor, or another coding agent:
 ```text
 I want to contribute to Agent Passport.
 
-Repository: https://github.com/ObiTracks/agent-passport
+Repository: https://github.com/UseOrchestrator/agent-passport
 
 Read README.md, CONTRIBUTING.md, AGENT_CONTRIBUTIONS.md, and ROADMAP.md.
 Then help me make one focused contribution.
@@ -78,7 +78,7 @@ Escalate only when the PR touches sensitive areas like credentials, auth, provid
 ```text
 I found a problem in Agent Passport.
 
-Repository: https://github.com/ObiTracks/agent-passport
+Repository: https://github.com/UseOrchestrator/agent-passport
 
 Help me file a concise GitHub issue. Ask only for details you need.
 Include the problem, steps to reproduce if known, expected behavior, and actual behavior.
@@ -89,7 +89,7 @@ Include the problem, steps to reproduce if known, expected behavior, and actual 
 ```text
 I want to request a feature for Agent Passport.
 
-Repository: https://github.com/ObiTracks/agent-passport
+Repository: https://github.com/UseOrchestrator/agent-passport
 
 Help me turn this into a concise GitHub issue. Ask only for details you need.
 Include the idea, why it matters, and the smallest useful first version.

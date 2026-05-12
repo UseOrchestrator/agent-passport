@@ -14,7 +14,7 @@ Join the standard:
 https://passport.orchestrator.so
 
 Repo:
-https://github.com/ObiTracks/agent-passport
+https://github.com/UseOrchestrator/agent-passport
 
 ---
 
