@@ -1,0 +1,33 @@
+name: Feature
+description: Suggest a feature, example, adapter, or docs improvement.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What should Agent Passport add or improve?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Who benefits, and what gets easier?
+    validations:
+      required: true
+  - type: textarea
+    id: first_version
+    attributes:
+      label: Smallest useful first version
+      description: What is the smallest PR that would move this forward?
+    validations:
+      required: false
+  - type: textarea
+    id: limitations
+    attributes:
+      label: Known limitations
+      description: Any provider, OAuth, security, or product assumption to be careful about?
+    validations:
+      required: false

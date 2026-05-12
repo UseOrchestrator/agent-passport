@@ -1,0 +1,33 @@
+name: Bug
+description: Report something broken or confusing.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What broke or felt wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Keep it short. Screenshots are useful if this is UI-related.
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: false
+  - type: textarea
+    id: agent
+    attributes:
+      label: Agent contribution
+      description: If you want, ask your coding agent to turn this into a focused PR.
+      value: "Bring the idea; let your coding agent make the PR."
+    validations:
+      required: false
