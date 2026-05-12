@@ -111,7 +111,8 @@ select {
   margin-bottom: 18px;
 }
 
-.signalRow span {
+.signalRow span,
+.signalRow a {
   border: 1px solid rgba(32, 112, 91, 0.26);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.56);
@@ -120,6 +121,10 @@ select {
   font-size: 0.78rem;
   font-weight: 800;
   line-height: 1;
+}
+
+.signalRow a {
+  cursor: pointer;
 }
 
 h1,

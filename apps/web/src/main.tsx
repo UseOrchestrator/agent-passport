@@ -250,6 +250,12 @@ function App() {
             <div className="signalRow" aria-label="Project signals">
               <span>Open source</span>
               <span>Connection passport standard</span>
+              <a
+                href="https://github.com/ObiTracks/agent-passport"
+                title="Star Agent Passport on GitHub"
+              >
+                GitHub ★
+              </a>
             </div>
             <p className="eyebrow">For AI products that need user app access</p>
             <h1>The connection passport for AI apps.</h1>
