@@ -22,9 +22,9 @@ const buildingOptions = [
 ];
 const painOptions = [
   'Too many OAuth screens',
+  'Provider lock-in',
   'Users drop off',
   'Hard to manage access',
-  'Provider lock-in',
 ];
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -51,6 +51,7 @@ function App() {
     'idle',
   );
   const [message, setMessage] = useState('');
+  const [selectedPains, setSelectedPains] = useState<string[]>([]);
 
   useEffect(() => {
     track('agent_passport_page_viewed');
@@ -72,13 +73,34 @@ function App() {
     const form = new FormData(formElement);
     const buildingPreset = String(form.get('buildingPreset') || '');
     const buildingDetail = String(form.get('buildingDetail') || '');
-    const painPreset = String(form.get('painPreset') || '');
+    const selectedProviders = form
+      .getAll('provider')
+      .map(String)
+      .filter(Boolean);
     const painDetail = String(form.get('painDetail') || '');
+
+    if (selectedProviders.length === 0) {
+      setStatus('error');
+      setMessage('Choose at least one connection provider.');
+      return;
+    }
+
+    if (selectedPains.length === 0) {
+      setStatus('error');
+      setMessage('Choose at least one connection pain.');
+      return;
+    }
+
     const payload = {
       email: String(form.get('email') || ''),
-      provider: String(form.get('provider') || ''),
+      provider: selectedProviders.join(', '),
       building: [buildingPreset, buildingDetail].filter(Boolean).join(' — '),
-      pain: [painPreset, painDetail].filter(Boolean).join(' — '),
+      pain: [
+        selectedPains.map((pain, index) => `${index + 1}. ${pain}`).join('; '),
+        painDetail,
+      ]
+        .filter(Boolean)
+        .join(' — '),
       call_opt_in: form.get('callOptIn') === 'on',
       source: 'agent-passport',
     };
@@ -104,6 +126,7 @@ function App() {
       }
 
       formElement.reset();
+      setSelectedPains([]);
       setStatus('success');
       setMessage('You are on the Agent Passport waitlist.');
       track('agent_passport_form_submitted', {
@@ -119,17 +142,34 @@ function App() {
     }
   }
 
+  function togglePain(option: string) {
+    setSelectedPains((current) => {
+      if (current.includes(option)) {
+        return current.filter((item) => item !== option);
+      }
+
+      if (current.length >= 2) {
+        return [current[1], option];
+      }
+
+      return [...current, option];
+    });
+  }
+
   return (
     <main>
       <section className="hero">
         <nav className="nav" aria-label="Primary">
-          <div className="mark">Agent Passport</div>
+          <div className="mark">
+            <span>Agent Passport</span>
+            <small>by Orchestrator</small>
+          </div>
           <a href="#waitlist">Join waitlist</a>
         </nav>
 
         <div className="heroGrid">
           <div className="heroCopy">
-            <p className="eyebrow">Agent Passport</p>
+            <p className="eyebrow">Agent Passport by Orchestrator</p>
             <h1>Let users bring their connected apps into your AI product.</h1>
             <p className="lede">
               AI products become useful after users connect Gmail, Slack,
@@ -317,11 +357,11 @@ function App() {
             </label>
 
             <fieldset>
-              <legend>Connection provider</legend>
+              <legend>Connection providers</legend>
               <div className="chipGrid providerChips">
                 {providerOptions.map((option) => (
                   <label className="choiceChip" key={option}>
-                    <input required type="radio" name="provider" value={option} />
+                    <input type="checkbox" name="provider" value={option} />
                     <span>{option}</span>
                   </label>
                 ))}
@@ -345,14 +385,27 @@ function App() {
             </fieldset>
 
             <fieldset>
-              <legend>Biggest connection pain</legend>
+              <legend>Biggest connection pain <em>choose up to 2</em></legend>
               <div className="chipGrid">
-                {painOptions.map((option) => (
+                {painOptions.map((option) => {
+                  const selectedIndex = selectedPains.indexOf(option);
+
+                  return (
                   <label className="choiceChip" key={option}>
-                    <input required type="radio" name="painPreset" value={option} />
-                    <span>{option}</span>
+                    <input
+                      checked={selectedIndex > -1}
+                      name="painPreset"
+                      type="checkbox"
+                      value={option}
+                      onChange={() => togglePain(option)}
+                    />
+                    <span>
+                      {selectedIndex > -1 ? `${selectedIndex + 1}. ` : ''}
+                      {option}
+                    </span>
                   </label>
-                ))}
+                  );
+                })}
               </div>
               <input
                 name="painDetail"
