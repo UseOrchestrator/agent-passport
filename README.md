@@ -336,6 +336,12 @@ Current goal:
 - identify whether startups would actually support a connection passport
 - find the first partner workflow worth prototyping
 
+Current storage:
+
+- waitlist submissions use a temporary isolated table in the existing Orchestrator dev/e2e Supabase project
+- this is only for validation
+- production Agent Passport auth, hosted accounts, provider metadata, and app-access state need a dedicated database/project later
+
 ## One-Line Pitch
 
 Agent Passport is the connection passport for AI apps.

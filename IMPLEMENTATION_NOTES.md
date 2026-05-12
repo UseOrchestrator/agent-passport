@@ -2,8 +2,8 @@
 
 ## Worktree
 
-Path: `/Users/obiihej/dev/orchestrator-agent-passport`  
-Branch: `feature/agent-passport-validation`
+Path: `/Users/obiihej/dev/agent-passport`  
+Branch: `main`
 
 ## Subdomain
 
@@ -52,10 +52,10 @@ Those are future product surfaces. The current work should validate whether foun
 
 ## Implementation Decision
 
-Build Agent Passport as its own product folder:
+Build Agent Passport as its own standalone repo:
 
 ```text
-agent-passport/apps/web
+/Users/obiihej/dev/agent-passport
 ```
 
 This keeps the validation page and future backend separate from Orchestrator.
@@ -65,6 +65,10 @@ This keeps the validation page and future backend separate from Orchestrator.
 Use Orchestrator's existing development/e2e Supabase database temporarily for the Agent Passport validation waitlist only.
 
 Do not apply Agent Passport validation tables to the production Supabase project.
+
+Do not add production Agent Passport auth, hosted accounts, OAuth/provider metadata, or app-access state to the existing Orchestrator Supabase project.
+
+Before that stage, create a dedicated Agent Passport Supabase project or another isolated database.
 
 This is an explicit temporary exception. Isolation must be strict:
 
