@@ -56,6 +56,11 @@ select {
   font-weight: 700;
 }
 
+.mark small a {
+  color: inherit;
+  cursor: pointer;
+}
+
 .nav a,
 .secondary,
 .primary,

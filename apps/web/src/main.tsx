@@ -162,7 +162,12 @@ function App() {
         <nav className="nav" aria-label="Primary">
           <div className="mark">
             <span>Agent Passport</span>
-            <small>by Orchestrator</small>
+            <small>
+              by{' '}
+              <a href="https://orchestrator.so" title="https://orchestrator.so">
+                Orchestrator
+              </a>
+            </small>
           </div>
           <a href="#waitlist">Join waitlist</a>
         </nav>
@@ -182,7 +187,7 @@ function App() {
                 href="#waitlist"
                 onClick={() => track('agent_passport_primary_cta_clicked')}
               >
-                Request design partner access
+                Join the standard
               </a>
               <a
                 className="secondary"
@@ -306,7 +311,8 @@ function App() {
               Because connection setup is becoming part of activation. Agent
               Passport gives your users a recognizable way to provision the right
               app set for your agent, while your product keeps its provider stack
-              and gets cleaner permissioning, reuse, and access control.
+              and gets cleaner permissioning, reuse, and access control. The goal
+              is an open-source standard that every AI app can support.
             </p>
           </div>
           <div className="codePanel">
@@ -338,12 +344,13 @@ function App() {
       <section className="band" id="waitlist">
         <div className="sectionInner split">
           <div>
-            <p className="eyebrow">Design partners</p>
+            <p className="eyebrow">Join the standard</p>
             <h2>Building an agent that needs a user's work apps?</h2>
             <p>
               Join if your users need different sets of app connections for
               different agent workflows. We are looking for a small number of
-              builders to shape the first partner flow.
+              builders, users, and contributors to shape the open-source connection
+              passport for AI apps.
             </p>
           </div>
           <form className="waitlistForm" onSubmit={handleSubmit}>
