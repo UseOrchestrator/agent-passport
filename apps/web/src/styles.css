@@ -151,11 +151,12 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 34px;
+  margin-top: 18px;
 }
 
 .primary,
 .waitlistForm button,
+.heroSignup button,
 .approval button {
   border: 0;
   color: #fff;
@@ -165,6 +166,36 @@ h2 {
 .waitlistForm button:disabled {
   cursor: wait;
   opacity: 0.68;
+}
+
+.heroSignup {
+  display: grid;
+  gap: 9px;
+  width: min(520px, 100%);
+  margin-top: 28px;
+}
+
+.heroSignupRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.heroSignup input,
+.heroSignup select {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid rgba(22, 22, 22, 0.16);
+  border-radius: 7px;
+  background: #fffdfa;
+  padding: 0 14px;
+}
+
+.heroSignup button {
+  min-height: 48px;
+  border-radius: 7px;
+  padding: 0 18px;
+  font-weight: 800;
 }
 
 .productShot {
@@ -301,15 +332,34 @@ h2 {
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   margin-top: 32px;
+  counter-reset: flow-step;
 }
 
 .flow div {
+  position: relative;
   min-height: 98px;
   padding: 18px;
   border-radius: 8px;
   color: #fff;
   background: #161616;
   font-weight: 750;
+}
+
+.flow div:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  top: 50%;
+  right: -17px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: #161616;
+  background: #8fd1b7;
+  font-size: 0.95rem;
+  transform: translateY(-50%);
 }
 
 .providers {
@@ -577,6 +627,13 @@ h2 {
     grid-template-columns: 1fr;
   }
 
+  .flow div:not(:last-child)::after {
+    top: auto;
+    right: 50%;
+    bottom: -17px;
+    transform: translate(50%, 0) rotate(90deg);
+  }
+
   .productShot {
     max-width: 560px;
   }
@@ -585,7 +642,7 @@ h2 {
 @media (max-width: 560px) {
   .hero {
     min-height: auto;
-    padding-top: 20px;
+    padding: 18px 18px 46px;
   }
 
   .nav {
@@ -595,7 +652,24 @@ h2 {
   }
 
   h1 {
-    font-size: 2.65rem;
+    font-size: 2.28rem;
+  }
+
+  h2 {
+    font-size: 1.85rem;
+  }
+
+  .lede {
+    margin-top: 18px;
+    font-size: 1rem;
+  }
+
+  .heroSignupRow {
+    grid-template-columns: 1fr;
+  }
+
+  .heroSignup button {
+    width: 100%;
   }
 
   .appGrid {

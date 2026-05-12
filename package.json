@@ -1,0 +1,15 @@
+{
+  "name": "agent-passport",
+  "private": true,
+  "version": "0.0.0",
+  "description": "The connection passport for AI apps.",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "yarn workspace @agent-passport/sdk build",
+    "typecheck": "yarn workspace @agent-passport/sdk typecheck"
+  },
+  "license": "MIT"
+}

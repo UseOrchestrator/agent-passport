@@ -1,0 +1,29 @@
+{
+  "name": "@agent-passport/sdk",
+  "version": "0.0.0",
+  "description": "TypeScript SDK for Agent Passport, the connection passport for AI apps.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "oauth",
+    "connections",
+    "passport",
+    "composio",
+    "mcp"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

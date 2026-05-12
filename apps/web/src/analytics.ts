@@ -4,7 +4,8 @@ type AnalyticsEvent =
   | 'agent_passport_secondary_cta_clicked'
   | 'agent_passport_form_started'
   | 'agent_passport_form_submitted'
-  | 'agent_passport_form_failed';
+  | 'agent_passport_form_failed'
+  | 'agent_passport_hero_email_submitted';
 
 type AnalyticsProperties = Record<string, string | number | boolean | null>;
 
@@ -41,4 +42,3 @@ function getDistinctId() {
   window.localStorage.setItem(key, created);
   return created;
 }
-

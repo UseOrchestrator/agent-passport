@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { motion, useReducedMotion } from 'motion/react';
 import { track } from './analytics';
 import './styles.css';
 
@@ -51,7 +52,21 @@ function App() {
     'idle',
   );
   const [message, setMessage] = useState('');
+  const [heroStatus, setHeroStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
+  const [heroMessage, setHeroMessage] = useState('');
+  const [heroExpanded, setHeroExpanded] = useState(false);
   const [selectedPains, setSelectedPains] = useState<string[]>([]);
+  const shouldReduceMotion = useReducedMotion();
+  const fadeUp = shouldReduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 22 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: '-80px' },
+        transition: { duration: 0.48, ease: 'easeOut' as const },
+      };
 
   useEffect(() => {
     track('agent_passport_page_viewed');
@@ -142,6 +157,60 @@ function App() {
     }
   }
 
+  async function handleHeroSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    setHeroStatus('loading');
+    setHeroMessage('');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setHeroStatus('error');
+      setHeroMessage('Waitlist storage is not configured yet.');
+      return;
+    }
+
+    const form = new FormData(formElement);
+    const email = String(form.get('email') || '');
+    const intent = String(form.get('intent') || 'Interested in Agent Passport');
+
+    try {
+      const response = await fetch(`${supabaseUrl}/rest/v1/agent_passport_waitlist`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          email,
+          provider: 'Not specified',
+          building: intent,
+          pain: 'Hero signup',
+          call_opt_in: false,
+          source: 'agent-passport-hero',
+        }),
+      });
+
+      if (!response.ok && response.status !== 409) {
+        throw new Error('Could not save your email.');
+      }
+
+      formElement.reset();
+      setHeroExpanded(false);
+      setHeroStatus('success');
+      setHeroMessage(
+        response.status === 409
+          ? 'You are already on the Agent Passport list.'
+          : 'You are on the Agent Passport list.',
+      );
+      track('agent_passport_hero_email_submitted', { intent });
+    } catch (error) {
+      setHeroStatus('error');
+      setHeroMessage(error instanceof Error ? error.message : 'Something went wrong.');
+    }
+  }
+
   function togglePain(option: string) {
     setSelectedPains((current) => {
       if (current.includes(option)) {
@@ -177,7 +246,7 @@ function App() {
         </nav>
 
         <div className="heroGrid">
-          <div className="heroCopy">
+          <motion.div className="heroCopy" {...fadeUp}>
             <div className="signalRow" aria-label="Project signals">
               <span>Open source</span>
               <span>Connection passport standard</span>
@@ -189,6 +258,33 @@ function App() {
               into your product, so your agent starts with the right tools and
               permissions instead of another setup wall.
             </p>
+            <form className="heroSignup" onSubmit={handleHeroSubmit}>
+              <div className="heroSignupRow">
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  placeholder="Work email"
+                  onFocus={() => setHeroExpanded(true)}
+                />
+                <button type="submit" disabled={heroStatus === 'loading'}>
+                  {heroStatus === 'loading' ? 'Joining...' : 'Join'}
+                </button>
+              </div>
+              {heroExpanded ? (
+                <select name="intent" defaultValue="I want to integrate this">
+                  <option>I want to integrate this</option>
+                  <option>I want to contribute</option>
+                  <option>I want to follow the standard</option>
+                  <option>I am a provider / integration partner</option>
+                </select>
+              ) : null}
+              {heroMessage ? (
+                <p className={heroStatus === 'error' ? 'formError' : 'formSuccess'}>
+                  {heroMessage}
+                </p>
+              ) : null}
+            </form>
             <div className="actions">
               <a
                 className="primary"
@@ -205,9 +301,18 @@ function App() {
                 How it works
               </a>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="productShot" aria-label="Agent Passport product preview">
+          <motion.div
+            className="productShot"
+            aria-label="Agent Passport product preview"
+            {...fadeUp}
+            transition={
+              shouldReduceMotion
+                ? undefined
+                : { duration: 0.52, delay: 0.08, ease: 'easeOut' as const }
+            }
+          >
             <div className="windowBar">
               <span />
               <span />
@@ -231,11 +336,11 @@ function App() {
                 <button type="button">Approve selected apps</button>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="band">
+      <motion.section className="band" {...fadeUp}>
         <div className="sectionInner">
           <p className="eyebrow">The problem</p>
           <h2>Before your agent can help, the user has to provision the right connections.</h2>
@@ -263,9 +368,9 @@ function App() {
             </article>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="section" id="how">
+      <motion.section className="section" id="how" {...fadeUp}>
         <div className="sectionInner">
           <p className="eyebrow">How it works</p>
           <h2>Agent Passport turns app access into reusable connection profiles.</h2>
@@ -281,9 +386,9 @@ function App() {
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="darkBand">
+      <motion.section className="darkBand" {...fadeUp}>
         <div className="sectionInner storyGrid">
           <div>
             <p className="eyebrow inverse">The user promise</p>
@@ -308,9 +413,9 @@ function App() {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="section">
+      <motion.section className="section" {...fadeUp}>
         <div className="sectionInner builderGrid">
           <div>
             <p className="eyebrow">For builders</p>
@@ -332,9 +437,9 @@ function App() {
 });`}</pre>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="band">
+      <motion.section className="band" {...fadeUp}>
         <div className="sectionInner">
           <p className="eyebrow">The product boundary</p>
           <h2>Bring the connection passport. Keep your provider stack.</h2>
@@ -347,9 +452,9 @@ function App() {
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="band" id="waitlist">
+      <motion.section className="band" id="waitlist" {...fadeUp}>
         <div className="sectionInner split">
           <div>
             <p className="eyebrow">Join the standard</p>
@@ -438,7 +543,7 @@ function App() {
             ) : null}
           </form>
         </div>
-      </section>
+      </motion.section>
     </main>
   );
 }
