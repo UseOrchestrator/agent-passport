@@ -30,19 +30,19 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const faqs = [
   {
-    question: 'Is this a Composio replacement?',
+    question: 'Do you replace Composio?',
     answer:
-      'Not at launch. Agent Passport is the consent, profile, and routing layer above providers. Providers can still hold credentials and execute app actions.',
+      'No. The first version is designed to sit above connection providers. They can still hold tokens and run tool calls. Agent Passport focuses on the user-facing access profile, consent, and handoff.',
   },
   {
-    question: 'Do tokens move between providers?',
+    question: 'Do users move tokens between apps?',
     answer:
-      'No. OAuth tokens are usually tied to the provider/app that created them. Agent Passport should promise portable app access, not magical token portability.',
+      'No. OAuth tokens are usually tied to the app or provider that created them. The useful product is portable approved access, not pretending raw tokens can magically move everywhere.',
   },
   {
-    question: 'Who is this for first?',
+    question: 'Who should join now?',
     answer:
-      'AI product builders whose users need to connect multiple work apps before the product becomes useful.',
+      'AI product builders whose users need Gmail, Slack, Calendar, Notion, GitHub, Linear, or other work apps connected before the product becomes useful.',
   },
 ];
 
@@ -129,13 +129,13 @@ function App() {
 
         <div className="heroGrid">
           <div className="heroCopy">
-            <p className="eyebrow">Portable app access for AI agents</p>
-            <h1>Stop making users reconnect the same apps in every AI product.</h1>
+            <p className="eyebrow">Agent Passport</p>
+            <h1>Let users bring their connected apps into your AI product.</h1>
             <p className="lede">
-              Agent Passport is a validation-stage app access layer for AI
-              product builders. Users bring approved access to Gmail, Slack,
-              Notion, Calendar, GitHub, and more without repeating the whole
-              setup every time.
+              AI products become useful after users connect Gmail, Slack,
+              Calendar, Notion, GitHub, Linear, and the rest of their work stack.
+              Agent Passport is a shared access layer so that setup can become
+              reusable instead of starting from zero in every product.
             </p>
             <div className="actions">
               <a
@@ -143,14 +143,14 @@ function App() {
                 href="#waitlist"
                 onClick={() => track('agent_passport_primary_cta_clicked')}
               >
-                Request beta access
+                Request design partner access
               </a>
               <a
                 className="secondary"
                 href="#how"
                 onClick={() => track('agent_passport_secondary_cta_clicked')}
               >
-                See how it works
+                How it works
               </a>
             </div>
           </div>
@@ -186,27 +186,30 @@ function App() {
       <section className="band">
         <div className="sectionInner">
           <p className="eyebrow">The problem</p>
-          <h2>AI app onboarding is becoming an OAuth wall.</h2>
+          <h2>The first session in an AI app is turning into app-connection setup.</h2>
           <div className="problemGrid">
             <article>
-              <strong>For users</strong>
+              <strong>Users repeat the same setup</strong>
               <p>
                 Every new AI product asks for Gmail, Slack, Notion, Calendar,
-                and GitHub again. The user repeats setup before they get value.
+                GitHub, and Linear again. The user is forced to rebuild the same
+                work context before the agent can help.
               </p>
             </article>
             <article>
-              <strong>For builders</strong>
+              <strong>Builders lose activation</strong>
               <p>
-                Connection providers handle credentials, but founders still own
-                the onboarding UX, consent language, status states, and drop-off.
+                Connection providers solve credential plumbing, but product teams
+                still own the onboarding wall, consent UX, app status, and drop-off
+                before the first useful action.
               </p>
             </article>
             <article>
-              <strong>For teams</strong>
+              <strong>Access gets fragmented</strong>
               <p>
-                It is hard to see which AI products have access, what they can
-                do, and how to revoke that access later.
+                As people try more AI products, access lives in more places.
+                Users and teams need a clearer way to see what is connected and
+                revoke it later.
               </p>
             </article>
           </div>
@@ -216,12 +219,12 @@ function App() {
       <section className="section" id="how">
         <div className="sectionInner">
           <p className="eyebrow">How it works</p>
-          <h2>Agent Passport owns consent and routing. Providers keep credentials.</h2>
+          <h2>A reusable app-access profile for the AI products users trust.</h2>
           <div className="flow">
-            <div>User connects apps</div>
-            <div>Agent Passport maps approved access</div>
-            <div>Provider holds tokens</div>
-            <div>AI app calls approved tools</div>
+            <div>User creates an app-access profile</div>
+            <div>Your product requests the apps it needs</div>
+            <div>User approves the access</div>
+            <div>Your agent starts with context ready</div>
           </div>
           <div className="providers">
             {providers.map((provider) => (
@@ -234,25 +237,25 @@ function App() {
       <section className="darkBand">
         <div className="sectionInner storyGrid">
           <div>
-            <p className="eyebrow inverse">End user flow</p>
-            <h2>One profile, reused across supported AI products.</h2>
+            <p className="eyebrow inverse">The user promise</p>
+            <h2>Connect your work stack once. Reuse it wherever Agent Passport is supported.</h2>
           </div>
           <div className="steps">
             <div>
               <span>01</span>
-              <p>User connects Gmail, Slack, Notion, Calendar, GitHub, and Linear.</p>
+              <p>User connects the work apps their agents need.</p>
             </div>
             <div>
               <span>02</span>
-              <p>User groups those apps into a Work profile.</p>
+              <p>User keeps those approvals in a reusable Work profile.</p>
             </div>
             <div>
               <span>03</span>
-              <p>A new AI product asks to use that approved profile.</p>
+              <p>A supported AI product asks for the specific access it needs.</p>
             </div>
             <div>
               <span>04</span>
-              <p>User can later see and revoke access from one control surface.</p>
+              <p>User can later review and revoke access from one place.</p>
             </div>
           </div>
         </div>
@@ -262,11 +265,12 @@ function App() {
         <div className="sectionInner builderGrid">
           <div>
             <p className="eyebrow">For builders</p>
-            <h2>The wedge is onboarding, not ideology.</h2>
+            <h2>Ship the first useful action sooner.</h2>
             <p>
-              Most teams will pick one connection provider and move on. Agent
-              Passport only matters if it makes the product flow better than
-              direct provider integration.
+              Agent Passport is only worth integrating if it helps users reach value
+              faster than a direct provider flow. The goal is fewer repeated
+              connection screens, clearer consent, and a reusable access pattern
+              users can recognize across AI products.
             </p>
           </div>
           <div className="codePanel">
@@ -282,8 +286,8 @@ function App() {
 
       <section className="band">
         <div className="sectionInner">
-          <p className="eyebrow">Questions we are testing</p>
-          <h2>This only deserves to exist if builders feel the pain.</h2>
+          <p className="eyebrow">The product boundary</p>
+          <h2>We are not selling magic token portability.</h2>
           <div className="faqGrid">
             {faqs.map((item) => (
               <article key={item.question}>
@@ -298,12 +302,12 @@ function App() {
       <section className="band" id="waitlist">
         <div className="sectionInner split">
           <div>
-            <p className="eyebrow">Validation launch</p>
-            <h2>We are looking for AI product builders with real app-access pain.</h2>
+            <p className="eyebrow">Design partners</p>
+            <h2>Building an AI product where app setup blocks activation?</h2>
             <p>
-              Join if your product needs users to connect work apps before your
-              agent can be useful. The first step is discovery and design
-              partners, not pretending the full platform is already finished.
+              Join the early list if your users need to connect multiple work apps
+              before your agent becomes useful. We are looking for a small number
+              of builders to shape the first partner flow.
             </p>
           </div>
           <form className="waitlistForm" onSubmit={handleSubmit}>
