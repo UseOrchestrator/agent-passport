@@ -164,16 +164,24 @@ function App() {
             <span>Agent Passport</span>
             <small>
               by{' '}
-              <a href="https://orchestrator.so" title="https://orchestrator.so">
+              <a
+                className="orchestratorLink"
+                href="https://orchestrator.so"
+                title="https://orchestrator.so"
+              >
                 Orchestrator
               </a>
             </small>
           </div>
-          <a href="#waitlist">Join waitlist</a>
+          <a className="navCta" href="#waitlist">Join the standard</a>
         </nav>
 
         <div className="heroGrid">
           <div className="heroCopy">
+            <div className="signalRow" aria-label="Project signals">
+              <span>Open source</span>
+              <span>Connection passport standard</span>
+            </div>
             <p className="eyebrow">For AI products that need user app access</p>
             <h1>The connection passport for AI apps.</h1>
             <p className="lede">

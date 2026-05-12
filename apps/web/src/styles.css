@@ -56,12 +56,7 @@ select {
   font-weight: 700;
 }
 
-.mark small a {
-  color: inherit;
-  cursor: pointer;
-}
-
-.nav a,
+.navCta,
 .secondary,
 .primary,
 .waitlistForm button,
@@ -75,10 +70,16 @@ select {
   font-weight: 700;
 }
 
-.nav a,
+.navCta,
 .secondary {
   border: 1px solid rgba(22, 22, 22, 0.18);
   background: rgba(255, 255, 255, 0.42);
+}
+
+.orchestratorLink {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
 }
 
 .heroGrid,
@@ -101,6 +102,24 @@ select {
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.signalRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.signalRow span {
+  border: 1px solid rgba(32, 112, 91, 0.26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.56);
+  color: #20705b;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
 }
 
 h1,
