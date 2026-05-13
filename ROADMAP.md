@@ -12,10 +12,12 @@
 
 ## Phase 1: Spec And SDK
 
-- [x] define Passport, Profile, Connection, Provider, Approval, Session, AccessObject
+- [x] document Access Request -> Access Grant -> provider handoff model
+- [ ] rename public SDK language from Session to Access Request
+- [x] define Passport, Profile, Connection, Provider, Approval, Access Grant, Provider Handoff
 - [ ] publish `@agent-passport/sdk`
 - [x] support mock access approval
-- [x] return flat provider-aware access objects
+- [x] return provider-aware access grants
 - [ ] ship Next.js/Vite examples
 
 ## Phase 2: First Provider Adapter

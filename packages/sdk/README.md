@@ -4,7 +4,7 @@ TypeScript SDK for Agent Passport.
 
 Agent Passport is the connection passport for AI apps.
 
-This package is currently a scaffold. The intended API is:
+Agent Passport does not execute tools in the v0 model. It creates access requests, receives user approval, and returns provider-aware access grants.
 
 ```ts
 import { AgentPassport } from "@agent-passport/sdk";
@@ -13,12 +13,25 @@ const passport = new AgentPassport({
   apiKey: process.env.AGENT_PASSPORT_API_KEY,
 });
 
-const session = await passport.sessions.create({
-  userId: "user_123",
-  requestedProfile: "sales-ops",
-  requiredApps: ["gmail", "calendar", "slack"],
+const request = await passport.accessRequests.create({
+  externalUserId: "user_123",
+  requestedApps: ["gmail", "calendar", "slack"],
+  purpose: "Draft customer follow-up emails",
   redirectUrl: "https://app.example.com/passport/complete",
+  providerPreference: "composio",
 });
+
+console.log(request.approvalUrl);
+
+const grant = await passport.accessRequests.getGrant(request.id);
+
+console.log(grant.connections);
 ```
 
-The first implementation should support mock sessions and flat provider-aware access objects before real provider adapters.
+The current implementation is mock-backed. The stable contract is:
+
+```text
+Access Request -> user approval -> Access Grant -> provider handoff
+```
+
+See [../../docs/technical-model.md](../../docs/technical-model.md).

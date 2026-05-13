@@ -11,6 +11,22 @@ Users should not have to reconnect Gmail, Slack, Calendar, Notion, GitHub, Linea
 
 Agent Passport is the shared layer between those two needs.
 
+## Technical Model
+
+Agent Passport should start as the passport, consent, and provider-handoff layer.
+
+It should not start as the service that executes every Gmail, Slack, Notion, or GitHub tool call.
+
+The core flow is:
+
+```text
+Access Request -> user approval -> Access Grant -> provider handoff
+```
+
+Read the full model:
+
+[docs/technical-model.md](docs/technical-model.md)
+
 ## Why This Exists
 
 Useful AI apps need access to the user's work.
