@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import GitHubButton from 'react-github-btn';
 import { motion, useReducedMotion } from 'motion/react';
 import { track } from './analytics';
 import './styles.css';
@@ -58,7 +59,6 @@ function App() {
   const [heroMessage, setHeroMessage] = useState('');
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [selectedPains, setSelectedPains] = useState<string[]>([]);
-  const [repoStars, setRepoStars] = useState<number | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const fadeUp = shouldReduceMotion
     ? {}
@@ -71,33 +71,6 @@ function App() {
 
   useEffect(() => {
     track('agent_passport_page_viewed');
-  }, []);
-
-  useEffect(() => {
-    let ignore = false;
-
-    fetch('https://api.github.com/repos/UseOrchestrator/agent-passport')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('GitHub repo metadata unavailable');
-        }
-
-        return response.json() as Promise<{ stargazers_count?: number }>;
-      })
-      .then((repo) => {
-        if (!ignore && typeof repo.stargazers_count === 'number') {
-          setRepoStars(repo.stargazers_count);
-        }
-      })
-      .catch(() => {
-        if (!ignore) {
-          setRepoStars(null);
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
   }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -270,6 +243,16 @@ function App() {
               </a>
             </small>
           </div>
+          <div className="githubStar" aria-label="Star Agent Passport on GitHub">
+            <GitHubButton
+              href="https://github.com/UseOrchestrator/agent-passport"
+              data-size="large"
+              data-show-count="true"
+              aria-label="Star UseOrchestrator/agent-passport on GitHub"
+            >
+              Star
+            </GitHubButton>
+          </div>
           <a className="navCta" href="#waitlist">Join the standard</a>
         </nav>
 
@@ -278,12 +261,6 @@ function App() {
             <div className="signalRow" aria-label="Project signals">
               <span>Open source</span>
               <span>Connection passport standard</span>
-              <a
-                href="https://github.com/UseOrchestrator/agent-passport"
-                title="Star Agent Passport on GitHub"
-              >
-                GitHub ★ {repoStars ?? ''}
-              </a>
             </div>
             <p className="eyebrow">For AI products that need user app access</p>
             <h1>The connection passport for AI apps.</h1>
