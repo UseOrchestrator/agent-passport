@@ -29,6 +29,10 @@ Read the full model:
 
 [docs/technical-model.md](docs/technical-model.md)
 
+Run the current agent/provider handoff spike:
+
+[examples/composio-agent-mission](examples/composio-agent-mission)
+
 ## Why This Exists
 
 Useful AI apps need access to the user's work.
@@ -337,6 +341,9 @@ Non-goals for the first prototype:
 agent-passport/
   apps/
     web/                  validation page and future app surface
+  examples/
+    composio-agent-mission/
+                          runnable grant-to-agent-to-Composio spike
   supabase/
     migrations/           temporary validation database schema
   reference/
