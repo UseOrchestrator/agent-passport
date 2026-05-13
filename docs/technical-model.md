@@ -45,6 +45,20 @@ The developer app owns:
 
 ## Terms
 
+The names are still not final.
+
+This document uses **Access Request** and **Access Grant** because they describe the technical shape better than `session`.
+
+That does not mean those are the final product words.
+
+The product may still choose friendlier language like:
+
+- Passport Request
+- Connect Request
+- App Access Grant
+- Connection Grant
+- Passport Grant
+
 ### Passport
 
 The user's overall app-access identity.
@@ -97,7 +111,7 @@ Purpose:
 Draft follow-up emails after sales calls.
 ```
 
-`Session` is technically okay, but it is vague.
+`Session` is technically okay, but it is vague. It sounds like a temporary browser/login state, not a request to use a passport profile.
 
 Better product/API words:
 
@@ -106,11 +120,11 @@ Better product/API words:
 - `PassportRequest`
 - `GrantRequest`
 
-Recommendation:
+Current recommendation:
 
-Use **Access Request** in product/docs.
+Use **Access Request** in technical docs until we pick the final public term.
 
-Use `accessRequests` or `connectRequests` in the SDK instead of `sessions`.
+Use `accessRequests`, `connectRequests`, or `passportRequests` in the SDK instead of `sessions`.
 
 ### Access Grant
 
@@ -152,6 +166,18 @@ This tells the developer:
 ## What The Agent Receives
 
 There are two possible ways an agent can receive Agent Passport output.
+
+Before the SDK is useful, we need an actual agent harness that consumes the grant.
+
+That harness should prove:
+
+- Agent Passport can create a request
+- the app can receive a grant
+- the grant can be translated into tools or provider references
+- an agent can receive that output
+- the agent can make a grounded decision about what it can and cannot call
+
+Without that harness, the SDK is only a shape, not a tested developer experience.
 
 ### Option A: The App Receives The Grant, Then Gives The Agent Tools
 
@@ -337,6 +363,10 @@ It is the passport and consent layer.
 
 ## SDK Proposal
 
+This is a proposed SDK shape, not final.
+
+The next implementation should include a runnable agent harness before we claim the SDK is useful.
+
 Use these nouns:
 
 - `passport.accessRequests.create`
@@ -345,7 +375,54 @@ Use these nouns:
 - `passport.profiles.list`
 - `passport.grants.revoke`
 
-Avoid `sessions` in public docs unless we need an internal implementation word.
+Avoid `sessions` in public docs unless we decide it is actually clearer after testing.
+
+## Required Agent Harness
+
+Build a small script before expanding the SDK.
+
+The script should act like a real AI app:
+
+```text
+1. Create a passport request for Gmail and Slack.
+2. Receive a mock Access Grant.
+3. Convert that grant into an agent-readable tool manifest.
+4. Give the manifest to a simple agent loop.
+5. Ask the agent: "What tools can you use?"
+6. Ask the agent to choose the right tool for a task.
+7. Prove the agent does not receive raw tokens.
+8. Prove the agent can see provider handoff metadata.
+```
+
+The harness does not need real Gmail or Slack calls.
+
+It needs to prove the handoff shape makes sense for an agent runtime.
+
+Example agent-readable manifest:
+
+```json
+{
+  "availableApps": ["gmail", "slack"],
+  "tools": [
+    {
+      "name": "gmail.search",
+      "provider": "composio",
+      "status": "available",
+      "handoffRef": "ca_gmail_demo"
+    },
+    {
+      "name": "slack.sendMessage",
+      "provider": "composio",
+      "status": "available",
+      "handoffRef": "ca_slack_demo"
+    }
+  ]
+}
+```
+
+This manifest is not the same thing as provider tool schemas.
+
+It is the bridge between Agent Passport's grant and the provider's real tools.
 
 ### Create An Access Request
 

@@ -13,8 +13,9 @@
 ## Phase 1: Spec And SDK
 
 - [x] document Access Request -> Access Grant -> provider handoff model
-- [ ] rename public SDK language from Session to Access Request
+- [ ] choose final public/API term for request/session/connect flow
 - [x] define Passport, Profile, Connection, Provider, Approval, Access Grant, Provider Handoff
+- [ ] build runnable agent harness that consumes a grant and feeds an agent tool manifest
 - [ ] publish `@agent-passport/sdk`
 - [x] support mock access approval
 - [x] return provider-aware access grants

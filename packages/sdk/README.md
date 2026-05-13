@@ -35,3 +35,5 @@ Access Request -> user approval -> Access Grant -> provider handoff
 ```
 
 See [../../docs/technical-model.md](../../docs/technical-model.md).
+
+The public/API naming is still under evaluation. `accessRequests` is a technical placeholder until the agent harness proves the right developer language.

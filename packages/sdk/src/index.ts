@@ -151,13 +151,4 @@ export class AgentPassport {
       return createMockGrant(accessRequestId);
     },
   };
-
-  /**
-   * Backwards-compatible alias while the public API moves from "sessions" to
-   * "access requests".
-   */
-  sessions = {
-    create: this.accessRequests.create,
-    getGrant: this.accessRequests.getGrant,
-  };
 }

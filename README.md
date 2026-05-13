@@ -23,6 +23,8 @@ The core flow is:
 Access Request -> user approval -> Access Grant -> provider handoff
 ```
 
+Those terms are technical placeholders. The public/API names are still being tested.
+
 Read the full model:
 
 [docs/technical-model.md](docs/technical-model.md)
@@ -203,48 +205,60 @@ The first version should start with apps and profiles, then expose tool metadata
 Agent Passport should make this simple:
 
 ```ts
-const session = await passport.sessions.create({
-  userId: "user_123",
-  requestedProfile: "sales-ops",
-  requiredApps: ["gmail", "calendar", "slack"],
+const request = await passport.accessRequests.create({
+  externalUserId: "user_123",
+  requestedApps: ["gmail", "calendar", "slack"],
+  purpose: "Draft customer follow-up emails",
   redirectUrl: "https://app.example.com/passport/complete",
+  providerPreference: "composio",
 });
 ```
 
 Then after approval:
 
 ```ts
-const access = await passport.access.get({
-  userId: "user_123",
-  profileId: "sales-ops",
-});
+const grant = await passport.accessRequests.getGrant(request.id);
 ```
 
 The response should be flat enough to use:
 
 ```json
 {
-  "profile": "sales-ops",
+  "id": "grant_123",
+  "status": "approved",
+  "profile": {
+    "id": "profile_work",
+    "name": "Work"
+  },
   "connections": [
     {
       "app": "gmail",
       "provider": "composio",
-      "providerConnectionId": "conn_abc",
       "scopes": ["email.read", "email.send"],
-      "status": "ready"
+      "status": "ready",
+      "handoff": {
+        "type": "composio_connected_account",
+        "entityId": "entity_demo",
+        "connectedAccountId": "ca_gmail_demo"
+      }
     },
     {
       "app": "slack",
       "provider": "nango",
-      "providerConnectionId": "conn_xyz",
       "scopes": ["channels.read", "messages.write"],
-      "status": "ready"
+      "status": "ready",
+      "handoff": {
+        "type": "nango_connection",
+        "connectionId": "conn_slack_demo"
+      }
     }
   ]
 }
 ```
 
-The developer should not have to care which provider created every connection unless they need to route execution.
+The developer should not receive raw tokens from Agent Passport.
+
+The developer should receive enough provider handoff metadata to continue with their provider stack.
 
 ## What Users Get
 
