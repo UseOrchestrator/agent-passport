@@ -28,8 +28,6 @@ const painOptions = [
   'Users drop off',
   'Hard to manage access',
 ];
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const faqs = [
   {
     question: 'Do you replace Composio?',
@@ -47,6 +45,39 @@ const faqs = [
       'AI product builders whose users need Gmail, Slack, Calendar, Notion, GitHub, Linear, or other work apps connected before the product becomes useful.',
   },
 ];
+
+type WaitlistPayload = {
+  email: string;
+  provider: string;
+  building: string;
+  pain: string;
+  call_opt_in: boolean;
+  source: string;
+};
+
+type WaitlistResponse = {
+  status: 'joined' | 'already_joined';
+  emailStatus?: 'sent' | 'skipped' | 'failed';
+};
+
+async function joinWaitlist(payload: WaitlistPayload): Promise<WaitlistResponse> {
+  const response = await fetch('/api/waitlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  const body = (await response.json().catch(() => ({}))) as
+    | WaitlistResponse
+    | { error?: string };
+
+  if (!response.ok) {
+    throw new Error('error' in body && body.error ? body.error : 'Could not save your email.');
+  }
+
+  return body as WaitlistResponse;
+}
 
 function App() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
@@ -78,13 +109,6 @@ function App() {
     const formElement = event.currentTarget;
     setStatus('loading');
     setMessage('');
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setStatus('error');
-      setMessage('Waitlist storage is not configured in this environment yet.');
-      track('agent_passport_form_failed', { reason: 'missing_supabase_env' });
-      return;
-    }
 
     const form = new FormData(formElement);
     const buildingPreset = String(form.get('buildingPreset') || '');
@@ -122,32 +146,20 @@ function App() {
     };
 
     try {
-      const response = await fetch(`${supabaseUrl}/rest/v1/agent_passport_waitlist`, {
-        method: 'POST',
-        headers: {
-          apikey: supabaseAnonKey,
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        if (response.status === 409) {
-          throw new Error('This email is already on the Agent Passport waitlist.');
-        }
-
-        throw new Error('The waitlist request could not be saved.');
-      }
+      const result = await joinWaitlist(payload);
 
       formElement.reset();
       setSelectedPains([]);
       setStatus('success');
-      setMessage('You are on the Agent Passport waitlist.');
+      setMessage(
+        result.status === 'already_joined'
+          ? 'You are already on the Agent Passport waitlist.'
+          : 'You are on the Agent Passport waitlist. Check your email for the repo and next steps.',
+      );
       track('agent_passport_form_submitted', {
         provider: payload.provider,
         call_opt_in: payload.call_opt_in,
+        email_status: result.emailStatus ?? 'unknown',
       });
     } catch (error) {
       setStatus('error');
@@ -164,48 +176,32 @@ function App() {
     setHeroStatus('loading');
     setHeroMessage('');
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      setHeroStatus('error');
-      setHeroMessage('Waitlist storage is not configured yet.');
-      return;
-    }
-
     const form = new FormData(formElement);
     const email = String(form.get('email') || '');
     const intent = String(form.get('intent') || 'Interested in Agent Passport');
 
     try {
-      const response = await fetch(`${supabaseUrl}/rest/v1/agent_passport_waitlist`, {
-        method: 'POST',
-        headers: {
-          apikey: supabaseAnonKey,
-          Authorization: `Bearer ${supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=minimal',
-        },
-        body: JSON.stringify({
-          email,
-          provider: 'Not specified',
-          building: intent,
-          pain: 'Hero signup',
-          call_opt_in: false,
-          source: 'agent-passport-hero',
-        }),
+      const result = await joinWaitlist({
+        email,
+        provider: 'Not specified',
+        building: intent,
+        pain: 'Hero signup',
+        call_opt_in: false,
+        source: 'agent-passport-hero',
       });
-
-      if (!response.ok && response.status !== 409) {
-        throw new Error('Could not save your email.');
-      }
 
       formElement.reset();
       setHeroExpanded(false);
       setHeroStatus('success');
       setHeroMessage(
-        response.status === 409
+        result.status === 'already_joined'
           ? 'You are already on the Agent Passport list.'
-          : 'You are on the Agent Passport list.',
+          : 'You are on the Agent Passport list. Check your email for the repo and next steps.',
       );
-      track('agent_passport_hero_email_submitted', { intent });
+      track('agent_passport_hero_email_submitted', {
+        intent,
+        email_status: result.emailStatus ?? 'unknown',
+      });
     } catch (error) {
       setHeroStatus('error');
       setHeroMessage(error instanceof Error ? error.message : 'Something went wrong.');
