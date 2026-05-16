@@ -10,7 +10,16 @@ interface AgentManifestTool {
 
 export interface AgentRunResult {
   mission: string;
-  executedToolSlug: string;
+  executedToolSlug?: string;
+  availableTools?: Record<string, string[]>;
+  executions?: Array<{
+    app: string;
+    connectedAccountId: string;
+    toolSlug?: string;
+    successful: boolean;
+    resultSummary?: unknown;
+    error?: string;
+  }>;
   manifest: {
     profile: string;
     tools: AgentManifestTool[];
@@ -42,13 +51,59 @@ function containsRawTokenShape(value: unknown): boolean {
   );
 }
 
+function getRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function summarizeProviderResult(app: string, value: unknown): unknown {
+  const record = getRecord(value);
+  const data = getRecord(record.data);
+  const error = record.error ?? null;
+  const successful = record.successful ?? false;
+  const logId = record.logId;
+
+  if (app === 'gmail') {
+    return {
+      successful,
+      error,
+      logId,
+      emailAddress: data.emailAddress,
+      messagesTotal: data.messagesTotal,
+      threadsTotal: data.threadsTotal,
+    };
+  }
+
+  if (app === 'googlecalendar') {
+    const eventData = getRecord(data.event_data);
+    const events = Array.isArray(eventData.event_data) ? eventData.event_data : [];
+
+    return {
+      successful,
+      error,
+      logId,
+      calendar: data.summary,
+      eventCount: events.length,
+      note: eventData.note,
+    };
+  }
+
+  return {
+    successful,
+    error,
+    logId,
+    dataKeys: Object.keys(data).slice(0, 12),
+  };
+}
+
 export async function runGmailAgentMission(
   composio: ComposioAdapter,
   userId: string,
   grant: AccessGrant,
   app = 'gmail',
 ): Promise<AgentRunResult> {
-  const mission = `Use the user-approved Work profile to run one read-only ${app} check.`;
+  const mission = `Use the user-approved Default profile to run one read-only ${app} check.`;
   const manifest = createManifest(grant);
   const connection = manifest.tools.find(
     (tool) => tool.app === app && tool.provider === 'composio' && tool.status === 'ready',
@@ -73,5 +128,73 @@ export async function runGmailAgentMission(
     decision: `Use the ${app} handoff reference with Composio. Do not touch raw OAuth tokens.`,
     rawTokenLeaked: containsRawTokenShape({ grant, manifest }),
     providerResult: providerResult.result,
+  };
+}
+
+export async function runDefaultPassportAgentMission(
+  composio: ComposioAdapter,
+  userId: string,
+  grant: AccessGrant,
+): Promise<AgentRunResult> {
+  const mission =
+    'Inspect the Default passport, list available provider tools, and execute safe read-only checks across connected apps.';
+  const manifest = createManifest(grant);
+  const readyConnections = manifest.tools.filter(
+    (tool) => tool.provider === 'composio' && tool.status === 'ready',
+  );
+  const apps = [...new Set(readyConnections.map((tool) => tool.app))];
+  const availableTools: Record<string, string[]> = {};
+
+  for (const app of apps) {
+    try {
+      availableTools[app] = (await composio.listTools(app)).slice(0, 12);
+    } catch (error) {
+      availableTools[app] = [`Could not list tools: ${error instanceof Error ? error.message : 'unknown error'}`];
+    }
+  }
+
+  const executions: AgentRunResult['executions'] = [];
+
+  for (const connection of readyConnections.slice(0, 3)) {
+    const connectedAccountId = connection.handoffRef.connectedAccountId;
+
+    if (typeof connectedAccountId !== 'string') {
+      executions.push({
+        app: connection.app,
+        connectedAccountId: '(missing)',
+        successful: false,
+        error: 'Missing connected account id.',
+      });
+      continue;
+    }
+
+    try {
+      const execution = await composio.executeReadOnlyTool(userId, connection.app, connectedAccountId);
+      executions.push({
+        app: connection.app,
+        connectedAccountId,
+        toolSlug: execution.toolSlug,
+        successful: true,
+        resultSummary: summarizeProviderResult(connection.app, execution.result),
+      });
+    } catch (error) {
+      executions.push({
+        app: connection.app,
+        connectedAccountId,
+        successful: false,
+        error: error instanceof Error ? error.message : 'Unknown execution error',
+      });
+    }
+  }
+
+  return {
+    mission,
+    manifest,
+    availableTools,
+    executions,
+    decision:
+      'Use the Default passport handoff references, inspect provider tools, then execute read-only provider calls without touching raw OAuth tokens.',
+    rawTokenLeaked: containsRawTokenShape({ grant, manifest }),
+    providerResult: executions,
   };
 }

@@ -58,6 +58,7 @@ export class ComposioAdapter {
 
     const request = await this.client.connectedAccounts.link(userId, authConfigId, {
       callbackUrl,
+      allowMultiple: true,
     });
 
     const redirectUrl = this.getObjectStringValue(request, 'redirectUrl');
@@ -121,6 +122,8 @@ export class ComposioAdapter {
       `${upperApp}_GET_PROFILE`,
       `${upperApp}_GET_USER`,
       `${upperApp}_LIST_USERS`,
+      `${upperApp}_LIST_EVENTS`,
+      `${upperApp}_FIND_EVENT`,
       `${upperApp}_SEARCH_EMAILS`,
       `${upperApp}_FETCH_EMAILS`,
     ];

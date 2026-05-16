@@ -151,6 +151,109 @@
         padding: 8px 9px;
       }
 
+      .passport {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .passport-card {
+        display: grid;
+        gap: 10px;
+        border: 1px solid #d8d4c9;
+        border-radius: 8px;
+        background: #fffdf8;
+        padding: 16px;
+      }
+
+      .set-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .set-pill {
+        border: 1px solid #171717;
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: #171717;
+        color: #ffffff;
+        font-size: 13px;
+      }
+
+      .set-pill.disabled {
+        border-color: #d8d4c9;
+        background: transparent;
+        color: #8a8378;
+      }
+
+      .passport-card strong {
+        font-size: 18px;
+      }
+
+      .passport-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 8px;
+        align-content: start;
+      }
+
+      .passport-item {
+        display: grid;
+        gap: 8px;
+        border: 1px solid #e5e0d5;
+        border-radius: 8px;
+        background: #ffffff;
+        padding: 10px;
+      }
+
+      .passport-item strong {
+        font-size: 14px;
+      }
+
+      .passport-item code {
+        color: #6a6358;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .account-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .account-pill {
+        display: inline-flex;
+        max-width: 100%;
+        border: 1px solid #d8d4c9;
+        border-radius: 999px;
+        padding: 5px 8px;
+        color: #555047;
+        font-size: 12px;
+      }
+
+      .auth-link {
+        display: none;
+        margin-top: 12px;
+        border: 1px solid #d8d4c9;
+        border-radius: 8px;
+        background: #ffffff;
+        padding: 10px;
+      }
+
+      .auth-link.visible {
+        display: grid;
+        gap: 8px;
+      }
+
+      .auth-link a {
+        color: #171717;
+        font-size: 13px;
+        word-break: break-all;
+      }
+
       .steps {
         display: grid;
         gap: 8px;
@@ -236,6 +339,10 @@
           grid-template-columns: 1fr;
         }
 
+        .passport {
+          grid-template-columns: 1fr;
+        }
+
         pre {
           min-height: 320px;
         }
@@ -273,6 +380,10 @@
             <button id="passport" class="secondary">Show passport</button>
             <button id="run" class="secondary">Run agent</button>
           </div>
+          <div class="auth-link" id="auth-link-box">
+            <strong>Auth link ready</strong>
+            <a id="auth-link" href="#" target="_blank" rel="noreferrer">Open provider auth link</a>
+          </div>
         </div>
 
         <ul class="steps">
@@ -307,9 +418,26 @@
         </ul>
       </section>
 
+      <section class="passport">
+        <div class="passport-card">
+          <span class="status">Passport set</span>
+          <strong id="passport-title">Default</strong>
+          <div class="set-tabs">
+            <span class="set-pill">Default</span>
+            <span class="set-pill disabled">Work later</span>
+            <span class="set-pill disabled">Personal later</span>
+            <span class="set-pill disabled">Client later</span>
+          </div>
+          <p id="passport-summary">No connected apps loaded yet.</p>
+        </div>
+        <div class="passport-list" id="passport-list"></div>
+      </section>
+
       <section>
         <h2>Composio apps</h2>
-        <p>These come from the provider catalog. Each button asks Composio for that app's OAuth link.</p>
+        <p id="catalog-summary">
+          These come from the provider catalog. Each button asks Composio for that app's OAuth link.
+        </p>
         <div class="apps" id="apps"></div>
       </section>
 
@@ -324,10 +452,15 @@
       const email = document.querySelector("#email");
       const app = document.querySelector("#app");
       const apps = document.querySelector("#apps");
+      const catalogSummary = document.querySelector("#catalog-summary");
+      const passportSummary = document.querySelector("#passport-summary");
+      const passportList = document.querySelector("#passport-list");
       const connectButton = document.querySelector("#connect");
       const statusButton = document.querySelector("#status");
       const passportButton = document.querySelector("#passport");
       const runButton = document.querySelector("#run");
+      const authLinkBox = document.querySelector("#auth-link-box");
+      const authLink = document.querySelector("#auth-link");
       let catalog = [];
 
       function write(value) {
@@ -336,6 +469,40 @@
 
       function mark(id, done) {
         document.querySelector(id).classList.toggle("done", done);
+      }
+
+      function renderPassport(passport) {
+        const connections = passport.connections ?? [];
+        const appCount = new Set(connections.map((connection) => connection.app)).size;
+        const accountCount = connections.length;
+        passportSummary.textContent = connections.length
+          ? `${passport.profile?.name ?? "Default"} contains ${appCount} connected app${appCount === 1 ? "" : "s"} and ${accountCount} connected account${accountCount === 1 ? "" : "s"}.`
+          : "This user's default passport set is empty.";
+
+        passportList.innerHTML = "";
+
+        const grouped = connections.reduce((groups, connection) => {
+          groups[connection.app] = groups[connection.app] || [];
+          groups[connection.app].push(connection);
+          return groups;
+        }, {});
+
+        for (const [appName, appConnections] of Object.entries(grouped)) {
+          const item = document.createElement("div");
+          item.className = "passport-item";
+          const accounts = appConnections
+            .map((connection) => {
+              const label = connection.label || connection.connectedAccountId;
+              return `<span class="account-pill">${label}</span>`;
+            })
+            .join("");
+          item.innerHTML = `
+            <strong>${appName}</strong>
+            <span class="status">Provider: ${appConnections[0].provider}</span>
+            <div class="account-pills">${accounts}</div>
+          `;
+          passportList.appendChild(item);
+        }
       }
 
       async function post(path, override = {}) {
@@ -373,6 +540,7 @@
 
         const preferred = ["gmail", "slack", "github", "googledrive", "googlecalendar", "notion"];
         catalog = body.apps;
+        catalogSummary.textContent = `Composio returned ${catalog.length} connectable apps for this provider account. The passport below only shows apps this demo user has actually connected.`;
         const sorted = [...catalog].sort((a, b) => {
           const ai = preferred.indexOf(a.app);
           const bi = preferred.indexOf(b.app);
@@ -437,8 +605,17 @@
       async function connectSelectedApp() {
         write(`Creating Composio ${app.value} OAuth link...`);
         const body = await post("/api/connect");
+        authLink.href = body.oauthUrl;
+        authLink.textContent = body.oauthUrl;
+        authLinkBox.classList.add("visible");
         write(body);
-        window.open(body.oauthUrl, "_blank", "noopener,noreferrer");
+        const opened = window.open(body.oauthUrl, "_blank", "noopener,noreferrer");
+        if (!opened) {
+          write({
+            ...body,
+            note: "Browser blocked the popup. Use the visible auth link above.",
+          });
+        }
       }
 
       connectButton.addEventListener("click", async () => {
@@ -462,6 +639,7 @@
       passportButton.addEventListener("click", async () => {
         try {
           const body = await post("/api/passport");
+          renderPassport(body);
           write(body);
         } catch (error) {
           write(error);
@@ -482,6 +660,9 @@
 
       loadConfig();
       loadCatalog();
+      post("/api/passport")
+        .then(renderPassport)
+        .catch(() => {});
     </script>
   </body>
 </html>

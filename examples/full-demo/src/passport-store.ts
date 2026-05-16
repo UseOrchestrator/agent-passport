@@ -10,6 +10,7 @@ export interface ProviderConnection {
   app: string;
   provider: 'composio';
   connectedAccountId: string;
+  label?: string;
   status: 'ready' | 'needs_auth';
   scopes: string[];
 }
@@ -72,6 +73,7 @@ function toPassportConnection(connection: ProviderConnection): PassportConnectio
     handoff: {
       type: 'composio_connected_account',
       connectedAccountId: connection.connectedAccountId,
+      label: connection.label,
     },
   };
 }
@@ -87,8 +89,8 @@ export function createAccessGrant(user: PassportUser, purpose: string, app?: str
     accessRequestId: `request_${randomUUID()}`,
     status: connections.length > 0 ? 'approved' : 'pending',
     profile: {
-      id: 'profile_work',
-      name: 'Work',
+      id: 'profile_default',
+      name: 'Default',
     },
     connections,
   };

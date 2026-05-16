@@ -4,7 +4,7 @@ import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ComposioAdapter } from './composio-adapter.js';
 import { loadLocalEnv } from './env.js';
-import { runGmailAgentMission } from './agent.js';
+import { runDefaultPassportAgentMission } from './agent.js';
 import {
   createAccessGrant,
   getConnections,
@@ -79,6 +79,7 @@ async function syncConnection(email: string, appInput?: string): Promise<{
       app,
       provider: 'composio',
       connectedAccountId: activeAccount.id,
+      label: activeAccount.label,
       status: 'ready',
       scopes: [`${app}.readonly`],
     });
@@ -115,6 +116,7 @@ async function syncPassport(email: string): Promise<{
       app: account.app,
       provider: 'composio',
       connectedAccountId: account.id,
+      label: account.label,
       status: 'ready',
       scopes: [`${account.app}.readonly`],
     });
@@ -199,8 +201,8 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, url
     sendJson(response, 200, {
       ...passport,
       profile: {
-        id: 'profile_work',
-        name: 'Work',
+        id: 'profile_default',
+        name: 'Default',
       },
     });
     return;
@@ -219,20 +221,21 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, url
       return;
     }
 
-    const app = normalizeApp(body.app);
-    const status = await syncConnection(body.email, app);
+    const passport = await syncPassport(body.email);
 
-    if (!status.connected) {
-      sendJson(response, 409, { error: `${app} is not connected yet.`, status });
+    if (passport.connections.length === 0) {
+      sendJson(response, 409, { error: 'Default passport has no connected apps yet.', passport });
       return;
     }
 
-    const grant = createAccessGrant(status.user, `Run one read-only ${app} agent check.`, app);
-    const result = await runGmailAgentMission(composio, status.user.id, grant, app);
+    const grant = createAccessGrant(
+      passport.user,
+      'Run read-only checks across the Default passport.',
+    );
+    const result = await runDefaultPassportAgentMission(composio, passport.user.id, grant);
 
     sendJson(response, 200, {
-      user: status.user,
-      app,
+      user: passport.user,
       grant,
       result,
     });
