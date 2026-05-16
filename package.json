@@ -14,8 +14,9 @@
   ],
   "scripts": {
     "build": "yarn workspace @agent-passport/sdk build",
-    "typecheck": "yarn workspace @agent-passport/sdk typecheck && yarn workspace @agent-passport/composio-agent-mission typecheck",
-    "example:composio": "yarn workspace @agent-passport/composio-agent-mission dev"
+    "typecheck": "yarn workspace @agent-passport/sdk typecheck && yarn workspace @agent-passport/composio-agent-mission typecheck && yarn workspace @agent-passport/full-demo typecheck",
+    "example:composio": "yarn workspace @agent-passport/composio-agent-mission dev",
+    "demo:full": "yarn workspace @agent-passport/full-demo dev"
   },
   "license": "MIT"
 }
